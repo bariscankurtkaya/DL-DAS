@@ -40,13 +40,14 @@ littleOnes = 0
 lessOnes = 0
 bigOnes = 0
 lessBiggerOnes = 0
+averagesArray = []
 
 #### Night ####
 
-#im_list = load_dataset("./Dataset/Gece/1/stereo/centre")
+im_list = load_dataset("./Dataset/Gece/1/stereo/centre")
 
 #For MacOs
-im_list = load_dataset("../../../../Volumes/Bariscan/Dataset/Gece/1/stereo/centre")
+#im_list = load_dataset("../../../../Volumes/Bariscan/Dataset/Gece/1/stereo/centre")
 
 tic = time.time()
 
@@ -54,6 +55,7 @@ for l in range(len(im_list)):
     img = cv2.imread(im_list[l] , cv2.IMREAD_UNCHANGED)
     #imgAverage = averageCalculation(x,img)
     imgAverage = averageCalculationWithNumpy(x,img)
+    averagesArray.append(imgAverage)
     allSum += imgAverage
     if(imgAverage > allMax):
         allMax = imgAverage
@@ -109,5 +111,9 @@ else:
 
 print(str(len(im_list)), "Photos in ", str((toc-tic)), "seconds")
 
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+plt.hist(averagesArray, bins=100)
+plt.show()
+
+
+#cv2.waitKey(0)
+#cv2.destroyAllWindows()
