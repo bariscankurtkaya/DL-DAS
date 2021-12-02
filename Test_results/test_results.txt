@@ -1,0 +1,44 @@
+im_list_array = ["./Dataset/Gece/1/stereo/centre", "./Dataset/Gece3/1/stereo/centre", "./Dataset/Gece4/1/stereo/centre", "./Dataset/gunduz2/1/stereo/centre", "./Dataset/gunduz3/1/stereo/centre", "./Dataset/gunduz4/1/stereo/centre"]
+
+
+average:  63.73508331594381
+NIGHT
+6504  ,  ./Dataset/Gece/1/stereo/centre/1418755833605692.png  ,  94.09089762369791
+nightErrorCount:  0
+6505 Photos in  83.84540104866028 seconds
+
+average:  82.14370824625622
+NIGHT
+5999  ,  ./Dataset/Gece3/1/stereo/centre/1425062274565369.png  ,  95.1347908528646
+nightErrorCount:  1
+6000 Photos in  78.97390103340149 seconds
+
+average:  85.12034781778993
+NIGHT
+5999  ,  ./Dataset/Gece4/1/stereo/centre/1418236559862556.png  ,  96.78135498046873
+nightErrorCount:  25
+6000 Photos in  81.15382313728333 seconds
+
+average:  136.8288220819046
+DAY
+5986  ,  ./Dataset/gunduz2/1/stereo/centre/1403622368908375.png  ,  56.552508138020826
+dayErrorCount:  148
+5987 Photos in  60.92936658859253 seconds
+
+average:  122.23213470675981
+DAY
+5999  ,  ./Dataset/gunduz3/1/stereo/centre/1403776844583084.png  ,  74.07445068359375
+dayErrorCount:  191
+6000 Photos in  63.12119770050049 seconds
+
+average:  131.9956542834472
+DAY
+5999  ,  ./Dataset/gunduz4/1/stereo/centre/1405353753215787.png  ,  35.71983479817709
+dayErrorCount:  102
+6000 Photos in  60.32753896713257 seconds
+
+
+treshold = 95
+Total Number of Pictures = 36.492
+nightError: 26 dayError = 441
+Error -> %1.20848405

@@ -26,7 +26,7 @@ def averageCalculationWithNumpy(img):
     #print(x)
     return x
 
-def main(im_listLocation, isNight):
+def main(im_listLocation, isNight, averagesArray):
     #x= 0
     allSum = 0
     average = 0
@@ -34,11 +34,8 @@ def main(im_listLocation, isNight):
     maxName = ""
     allMin = 255
     minName = ""
-    littleOnes = 0
-    lessOnes = 0
-    bigOnes = 0
-    lessBiggerOnes = 0
-    averagesArray = []
+    dayErrorCount = 0    
+    nightErrorCount = 0
 
     
     tic = time.time()
@@ -55,17 +52,15 @@ def main(im_listLocation, isNight):
                 allMax = imgAverage
                 maxName = im_list[l]
             if(imgAverage > 95):
-                bigOnes = bigOnes + 1
-            if(imgAverage > 90):
-                lessBiggerOnes = lessBiggerOnes + 1
+                nightErrorCount = nightErrorCount + 1
+
         else:
             if(imgAverage < allMin):
                 allMin = imgAverage
                 minName = im_list[l]
             if(imgAverage < 95):
-                littleOnes = littleOnes + 1
-            if(imgAverage < 100):
-                lessOnes = lessOnes + 1
+                dayErrorCount = dayErrorCount + 1
+
     
     
     average = allSum/len(im_list)
@@ -75,17 +70,16 @@ def main(im_listLocation, isNight):
     if(average >= 100):
         print("DAY")
         print(l, " , ", minName, " , ", allMin)
-        print("lessOnes: ", lessOnes, " -- littleOnes: ", littleOnes )
+        print("dayErrorCount: ", dayErrorCount)
 
     else:
         print("NIGHT")
         print(l, " , ", maxName, " , ", allMax)
-        print("lessBiggerOnes: ", lessBiggerOnes, " -- bigOnes: ", bigOnes )
+        print("nightErrorCount: ", nightErrorCount)
 
-    plt.hist(averagesArray, bins=255, range=[0,255])
-    
     toc = time.time()
     print(str(len(im_list)), "Photos in ", str((toc-tic)), "seconds\n")
+    return averagesArray
     
 ######################### ALGORITHM ##########################
 
@@ -94,18 +88,24 @@ def main(im_listLocation, isNight):
 #im_list = load_dataset("../../../../Volumes/Bariscan/Dataset/sample/stereo/centre")
 #im_list = load_dataset("../../../../Volumes/Bariscan/Dataset/gunduz1/Centre")
 
+nightAveragesArray = []
+dayAveragesArray = []
 
-im_list_array = ["./Dataset/Gece/1/stereo/centre", "./Dataset/Gece3/1/stereo/centre", "./Dataset/gunduz1/centre", "./Dataset/sample/stereo/centre", "./Dataset/gunduz2/1/stereo/centre", "./Dataset/gunduz3/1/stereo/centre"]
+im_list_array = ["./Dataset/Gece/1/stereo/centre", "./Dataset/Gece3/1/stereo/centre", "./Dataset/Gece4/1/stereo/centre", "./Dataset/gunduz2/1/stereo/centre", "./Dataset/gunduz3/1/stereo/centre", "./Dataset/gunduz4/1/stereo/centre"]
+
 
 for i in range(len(im_list_array)):
     if "Gece" in im_list_array[i]:
         isNight = True
+        averagesArray = main(im_list_array[i], isNight, nightAveragesArray)
+        nightAveragesArray += averagesArray
     else:
         isNight = False
-
-    main(im_list_array[i], isNight)
-
-
+        averagesArray = main(im_list_array[i], isNight, dayAveragesArray)
+        dayAveragesArray += averagesArray
+        
+plt.hist(nightAveragesArray, bins=255, range=[0,255])
+plt.hist(dayAveragesArray, bins=255, range=[0,255])
 
 
 plt.show()
