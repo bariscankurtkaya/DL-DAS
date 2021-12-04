@@ -104,15 +104,21 @@ def histogramGenerator(nightAveragesArray, dayAveragesArray):
     plt.show()
     
 
-def averageImgDisplay(nightImageArray, dayImageArray):
-    nightImageAveragesArray = np.true_divide(nightImageArray, nightImageCount)
-    dayImageAveragesArray = np.true_divide(dayImageArray, dayImageCount)
+def averageImgDisplay(nightImageArray, nightImageCount, dayImageArray, dayImageCount):
+    nightTotalImgAverage = nightImageArray/ nightImageCount
+    dayTotalImgAverage = dayImageArray/ dayImageCount
 
-    cv2.imshow("night",nightImageAveragesArray)
-    cv2.imshow("day",dayImageAveragesArray)
+    nightTotalImgAverage = nightTotalImgAverage.astype(int)
+    dayTotalImgAverage = dayTotalImgAverage.astype(int)
+
+
+    cv2.imshow("night",nightTotalImgAverage)
+    cv2.imshow("day",dayTotalImgAverage)
     
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+    
+    return nightTotalImgAverage, dayTotalImgAverage
     
 ######################### ALGORITHM ##########################
 
@@ -167,4 +173,4 @@ for i in range(len(im_list_array)):
 if not isDisplay:
     histogramGenerator(nightAveragesArray, dayAveragesArray)
 else:
-    averageImgDisplay(nightImageArray, nightImageCount, dayImageArray, dayImageCount)
+    nightTotalImgAverage, dayTotalImgAverage = averageImgDisplay(nightImageArray, nightImageCount, dayImageArray, dayImageCount)
