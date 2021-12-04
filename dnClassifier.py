@@ -26,7 +26,7 @@ def averageCalculationWithNumpy(img):
     #print(x)
     return x
 
-def main(im_listLocation, isNight, averagesArray):
+def mainAlgorithm(im_listLocation, isNight, averagesArray):
     #x= 0
     allSum = 0
     average = 0
@@ -84,9 +84,8 @@ def main(im_listLocation, isNight, averagesArray):
 ######################### ALGORITHM ##########################
 
 #For MacOs
-#im_list = load_dataset("../../../../Volumes/Bariscan/Dataset/Gece/1/stereo/centre")
-#im_list = load_dataset("../../../../Volumes/Bariscan/Dataset/sample/stereo/centre")
-#im_list = load_dataset("../../../../Volumes/Bariscan/Dataset/gunduz1/Centre")
+# im_list_array = ["../../../../Volumes/Bariscan/Dataset/Gece/1/stereo/centre", "../../../../Volumes/Bariscan/Dataset/sample/stereo/centre", "../../../../Volumes/Bariscan/Dataset/gunduz1/Centre"]
+
 
 nightAveragesArray = []
 dayAveragesArray = []
@@ -97,11 +96,11 @@ im_list_array = ["./Dataset/Gece/1/stereo/centre", "./Dataset/Gece3/1/stereo/cen
 for i in range(len(im_list_array)):
     if "Gece" in im_list_array[i]:
         isNight = True
-        averagesArray = main(im_list_array[i], isNight, nightAveragesArray)
+        averagesArray = mainAlgorithm(im_list_array[i], isNight, nightAveragesArray)
         nightAveragesArray += averagesArray
     else:
         isNight = False
-        averagesArray = main(im_list_array[i], isNight, dayAveragesArray)
+        averagesArray = mainAlgorithm(im_list_array[i], isNight, dayAveragesArray)
         dayAveragesArray += averagesArray
         
 plt.hist(nightAveragesArray, bins=255, range=[0,255])
