@@ -118,21 +118,23 @@ def averageImgDisplay(nightImageArray, dayImageArray):
 
 #For MacOs
 # im_list_array = ["../../../../Volumes/Bariscan/Dataset/Gece/1/stereo/centre", "../../../../Volumes/Bariscan/Dataset/sample/stereo/centre", "../../../../Volumes/Bariscan/Dataset/gunduz1/Centre"]
+im_list_array = ["./Dataset/Gece/1/stereo/centre", "./Dataset/Gece3/1/stereo/centre", "./Dataset/Gece4/1/stereo/centre", "./Dataset/gunduz2/1/stereo/centre", "./Dataset/gunduz3/1/stereo/centre", "./Dataset/gunduz4/1/stereo/centre"]
 
 
 nightAveragesArray = []
 dayAveragesArray = []
 
+
 nightImageArray = np.array([0]) #It will keep all photographs average pixel by pixel
 dayImageArray = np.array([0])
+
 
 nightImageCount = 0
 dayImageCount = 0
 
-im_list_array = ["./Dataset/Gece/1/stereo/centre", "./Dataset/Gece3/1/stereo/centre", "./Dataset/Gece4/1/stereo/centre", "./Dataset/gunduz2/1/stereo/centre", "./Dataset/gunduz3/1/stereo/centre", "./Dataset/gunduz4/1/stereo/centre"]
-
 
 isDisplay = True
+
 
 for i in range(len(im_list_array)):
     im_list = load_dataset(im_list_array[i])
