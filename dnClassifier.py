@@ -112,11 +112,11 @@ def averageImgDisplay(nightImageArray, nightImageCount, dayImageArray, dayImageC
     dayTotalImgAverage = dayTotalImgAverage.astype(int)
 
 
-    cv2.imshow("night",nightTotalImgAverage)
-    cv2.imshow("day",dayTotalImgAverage)
+    #cv2.imshow("night",nightTotalImgAverage)
+    #cv2.imshow("day",dayTotalImgAverage)
     
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
     
     return nightTotalImgAverage, dayTotalImgAverage
     
