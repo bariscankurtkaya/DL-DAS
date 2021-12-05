@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import glob
 import numpy as np
 import time
+from PIL import Image as im
+
 
 def load_dataset(image_dir):
     return (glob.glob(image_dir + "/*.png")) 
@@ -94,7 +96,7 @@ def thresholdTest(im_list, isNight, averagesArray):
         print("nightErrorCount: ", nightErrorCount)
     toc = time.time()
     print(str(len(im_list)), "Photos in ", str((toc-tic)), "seconds\n")
-    return averagesArray;
+    return averagesArray
     
 
 def histogramGenerator(nightAveragesArray, dayAveragesArray):
@@ -108,18 +110,41 @@ def averageImgDisplay(nightImageArray, nightImageCount, dayImageArray, dayImageC
     nightTotalImgAverage = nightImageArray/ nightImageCount
     dayTotalImgAverage = dayImageArray/ dayImageCount
 
-    nightTotalImgAverage = nightTotalImgAverage.astype(int)
-    dayTotalImgAverage = dayTotalImgAverage.astype(int)
+    nightTotalImgAverage = nightTotalImgAverage.astype(np.uint8)
+    dayTotalImgAverage = dayTotalImgAverage.astype(np.uint8)
 
 
-    #cv2.imshow("night",nightTotalImgAverage)
-    #cv2.imshow("day",dayTotalImgAverage)
+    cv2.imshow("night",nightTotalImgAverage)
+    cv2.imshow("day",dayTotalImgAverage)
     
-    #cv2.waitKey(0)
-    #cv2.destroyAllWindows()
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
     
     return nightTotalImgAverage, dayTotalImgAverage
     
+
+def saveArrayAsImage(array, name):
+    data = im.fromarray(array)
+    data.save(name)
+    
+
+def readyAverageData():
+    dayData = np.load('./Test_results/dayTotalImgAverage.npy')
+    nightData = np.load('./Test_results/nightTotalImgAverage.npy')
+    return dayData, nightData;
+    
+def displayImages(nightTotalImgAverage, dayTotalImgAverage):
+    nightTotalImgAverage = nightTotalImgAverage.astype(np.uint8)
+    dayTotalImgAverage = dayTotalImgAverage.astype(np.uint8)
+    
+    
+    cv2.imshow("night",nightTotalImgAverage)
+    cv2.imshow("day",dayTotalImgAverage)
+    
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    
+
 ######################### ALGORITHM ##########################
 
 #For MacOs
@@ -140,37 +165,48 @@ dayImageCount = 0
 
 
 isDisplay = True
+isDataReady = True
 
 
-for i in range(len(im_list_array)):
-    im_list = load_dataset(im_list_array[i])
+if not isDataReady:
+    for i in range(len(im_list_array)):
+        im_list = load_dataset(im_list_array[i])
+        
+        if "Gece" in im_list_array[i]:
+            isNight = True
+            nightImageCount += len(im_list)
+            
+            if not isDisplay:
+                averagesArray = thresholdTest(im_list, isNight, nightAveragesArray)
+                nightAveragesArray += averagesArray
+                
+            else:
+                nightImageArray = totalImageCalculator(im_list, nightImageArray)
+                
+        else:
+            isNight = False
+            dayImageCount += len(im_list)
+            
+            if not isDisplay:
+                averagesArray = thresholdTest(im_list, isNight, dayAveragesArray)
+                dayAveragesArray += averagesArray
+                
+            else:
+                dayImageArray = totalImageCalculator(im_list, dayImageArray)
     
-    if "Gece" in im_list_array[i]:
-        isNight = True
-        nightImageCount += len(im_list)
-        
-        if not isDisplay:
-            averagesArray = thresholdTest(im_list, isNight, nightAveragesArray)
-            nightAveragesArray += averagesArray
             
-        else:
-            nightImageArray = totalImageCalculator(im_list, nightImageArray)
             
+    
+    if not isDisplay:
+        histogramGenerator(nightAveragesArray, dayAveragesArray)
     else:
-        isNight = False
-        dayImageCount += len(im_list)
-        
-        if not isDisplay:
-            averagesArray = thresholdTest(im_list, isNight, dayAveragesArray)
-            dayAveragesArray += averagesArray
-            
-        else:
-            dayImageArray = totalImageCalculator(im_list, dayImageArray)
+        nightTotalImgAverage, dayTotalImgAverage = averageImgDisplay(nightImageArray, nightImageCount, dayImageArray, dayImageCount)
 
-        
-        
-
-if not isDisplay:
-    histogramGenerator(nightAveragesArray, dayAveragesArray)
 else:
-    nightTotalImgAverage, dayTotalImgAverage = averageImgDisplay(nightImageArray, nightImageCount, dayImageArray, dayImageCount)
+    
+    dayTotalImgAverage, nightTotalImgAverage = readyAverageData()
+    displayImages(nightTotalImgAverage, dayTotalImgAverage)
+
+
+#saveArrayAsImage(nightTotalImgAverage, "nightAverage.png")
+#saveArrayAsImage(dayTotalImgAverage, "dayAverage.png")
