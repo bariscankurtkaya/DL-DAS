@@ -123,9 +123,8 @@ def averageImgDisplay(nightImageArray, nightImageCount, dayImageArray, dayImageC
     return nightTotalImgAverage, dayTotalImgAverage
     
 
-def saveArrayAsImage(array, name):
-    data = im.fromarray(array)
-    data.save(name)
+def saveArrayAsImage(name, array):
+    cv2.imwrite(name, array)
     
 
 def readyAverageData():
@@ -133,10 +132,13 @@ def readyAverageData():
     nightData = np.load('./Test_results/nightTotalImgAverage.npy')
     return dayData, nightData;
     
+
 def displayImages(nightTotalImgAverage, dayTotalImgAverage):
     nightTotalImgAverage = nightTotalImgAverage.astype(np.uint8)
     dayTotalImgAverage = dayTotalImgAverage.astype(np.uint8)
     
+    saveArrayAsImage("./Test_results/nightAverage.png",nightTotalImgAverage)
+    saveArrayAsImage("./Test_results/dayAverage.png",dayTotalImgAverage)
     
     cv2.imshow("night",nightTotalImgAverage)
     cv2.imshow("day",dayTotalImgAverage)
