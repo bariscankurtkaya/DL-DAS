@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import glob
 import numpy as np
 import time
-from PIL import Image as im
 
 
 def load_dataset(image_dir):
