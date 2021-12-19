@@ -38,9 +38,8 @@ def totalImageCalculator(im_list, imgArray):
     return imgArray;
 
 
-
-
-def thresholdTest(im_list, isNight, averagesArray):
+    
+def thresholdTest(im_list, isNight, averagesArray, filterImg, isFilter):
     #x= 0
     allSum = 0
     average = 0
@@ -52,6 +51,7 @@ def thresholdTest(im_list, isNight, averagesArray):
     nightErrorCount = 0
         
     tic = time.time()
+    filterImg = cv2.imread(filterImg , cv2.IMREAD_UNCHANGED)
 
     for l in range(len(im_list)):
         img = cv2.imread(im_list[l] , cv2.IMREAD_UNCHANGED)
@@ -59,23 +59,32 @@ def thresholdTest(im_list, isNight, averagesArray):
         #img = img[0:201,500:900]
         #imgAverage = averageCalculation(x,img)
         
+        if isFilter:
+            img = np.multiply(img, filterImg)
+        
         imgAverage = averageCalculationWithNumpy(img)
         averagesArray.append(imgAverage)
         allSum += imgAverage
         
-        
+        if not isFilter:
+            imgAverageThreshold = 75
+            allAverageThreshold = 100
+        else:
+            imgAverageThreshold = 15
+            allAverageThreshold = 12
+
         if(isNight == True):
             if(imgAverage > allMax):
                 allMax = imgAverage
                 maxName = im_list[l]
-            if(imgAverage > 75):
+            if(imgAverage > imgAverageThreshold):
                 nightErrorCount = nightErrorCount + 1
 
         else:
             if(imgAverage < allMin):
                 allMin = imgAverage
                 minName = im_list[l]
-            if(imgAverage < 75):
+            if(imgAverage < imgAverageThreshold):
                 dayErrorCount = dayErrorCount + 1
 
     
@@ -84,7 +93,7 @@ def thresholdTest(im_list, isNight, averagesArray):
 
     print("average: ", average)
     
-    if(average >= 100):
+    if(average >= allAverageThreshold):
         print("DAY")
         print(l, " , ", minName, " , ", allMin)
         print("dayErrorCount: ", dayErrorCount)
@@ -152,6 +161,7 @@ def displayImages(nightTotalImgAverage, dayTotalImgAverage):
 # im_list_array = ["../../../../Volumes/Bariscan/Dataset/Gece/1/stereo/centre", "../../../../Volumes/Bariscan/Dataset/sample/stereo/centre", "../../../../Volumes/Bariscan/Dataset/gunduz1/Centre"]
 im_list_array = ["./Dataset/Gece/1/stereo/centre", "./Dataset/Gece3/1/stereo/centre", "./Dataset/Gece4/1/stereo/centre", "./Dataset/gunduz2/1/stereo/centre", "./Dataset/gunduz3/1/stereo/centre", "./Dataset/gunduz4/1/stereo/centre"]
 
+filterImg = (glob.glob("./Test_results/filterImg.png")) 
 
 nightAveragesArray = []
 dayAveragesArray = []
@@ -165,9 +175,9 @@ nightImageCount = 0
 dayImageCount = 0
 
 
-isDisplay = True
-isDataReady = True
-
+isDisplay = False
+isDataReady = False
+isFilter = True
 
 if not isDataReady:
     for i in range(len(im_list_array)):
@@ -178,7 +188,7 @@ if not isDataReady:
             nightImageCount += len(im_list)
             
             if not isDisplay:
-                averagesArray = thresholdTest(im_list, isNight, nightAveragesArray)
+                averagesArray = thresholdTest(im_list, isNight, nightAveragesArray, filterImg[0], isFilter)
                 nightAveragesArray += averagesArray
                 
             else:
@@ -189,7 +199,7 @@ if not isDataReady:
             dayImageCount += len(im_list)
             
             if not isDisplay:
-                averagesArray = thresholdTest(im_list, isNight, dayAveragesArray)
+                averagesArray = thresholdTest(im_list, isNight, dayAveragesArray, filterImg[0], isFilter)
                 dayAveragesArray += averagesArray
                 
             else:

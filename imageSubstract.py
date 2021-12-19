@@ -25,20 +25,17 @@ def imageSubstraction(dayImg, nightImg):
 
 
 def createFilter(dayImg, nightImg):
-    dayFilter = np.zeros((len(dayImg),len(dayImg[0])), dtype = type(dayImg[0][0]))
-    nightFilter = np.zeros((len(dayImg),len(dayImg[0])), dtype = type(dayImg[0][0]))
+    filterImg = np.zeros((len(dayImg),len(dayImg[0])), dtype = type(dayImg[0][0]))
 
     for i in range(len(dayImg)):
         for j in range(len(dayImg[i])):
             if(int(dayImg[i][j]) - int(nightImg[i][j]) > 127):
-                dayFilter[i][j] = dayImg[i][j] - nightImg[i][j]
-            elif(int(nightImg[i][j]) - int(dayImg[i][j]) > 127):
-                nightFilter[i][j] = nightImg[i][j] - dayImg[i][j]
-            
-    
-    cv2.imwrite("./Test_results/dayFilter.png", dayFilter)
-    cv2.imwrite("./Test_results/nightFilter.png", nightFilter)
+                filterImg[i][j] = 1
 
+            
+    filterImg = filterImg.astype(np.uint8)
+    cv2.imwrite("./Test_results/filterImg.png", filterImg)
+    return filterImg
     
     
     
@@ -52,4 +49,4 @@ dayImg = cv2.imread(dayAveragePhoto[0] , cv2.IMREAD_UNCHANGED)
 nightImg = cv2.imread(nightAveragePhoto[0] , cv2.IMREAD_UNCHANGED)
 
 #imageSubstraction(dayImg, nightImg)
-createFilter(dayImg, nightImg)
+filterImg = createFilter(dayImg, nightImg)
