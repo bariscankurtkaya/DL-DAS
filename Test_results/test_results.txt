@@ -85,8 +85,8 @@ dayErrorCount:  62
 
 ------------------------------------------------------------------
 imgAverageThreshold = 54
-allAverageThreshold = 2595
+allAverageThreshold = 25
 Total Number of Pictures = 36.492
-nightError: 0 dayError = 424341
+nightError: 0 dayError = 243
 Error -> %0,665899375
 ------------------------------------------------------------------
