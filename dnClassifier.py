@@ -60,6 +60,8 @@ def thresholdTest(im_list, isNight, averagesArray, filterImg, isFilter):
         #imgAverage = averageCalculation(x,img)
         
         if isFilter:
+            img = img.astype(int)
+            filterImg = filterImg.astype(int)
             img = np.multiply(img, filterImg)
         
         imgAverage = averageCalculationWithNumpy(img)
@@ -70,8 +72,8 @@ def thresholdTest(im_list, isNight, averagesArray, filterImg, isFilter):
             imgAverageThreshold = 75
             allAverageThreshold = 100
         else:
-            imgAverageThreshold = 15
-            allAverageThreshold = 12
+            imgAverageThreshold = 54
+            allAverageThreshold = 25
 
         if(isNight == True):
             if(imgAverage > allMax):

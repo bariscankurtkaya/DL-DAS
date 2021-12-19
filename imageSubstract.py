@@ -29,8 +29,17 @@ def createFilter(dayImg, nightImg):
 
     for i in range(len(dayImg)):
         for j in range(len(dayImg[i])):
-            if(int(dayImg[i][j]) - int(nightImg[i][j]) > 127):
+            if(int(dayImg[i][j]) - int(nightImg[i][j]) > 230):
+                filterImg[i][j] = 5
+            elif(int(dayImg[i][j]) - int(nightImg[i][j]) > 200):
+                filterImg[i][j] = 4
+            elif(int(dayImg[i][j]) - int(nightImg[i][j]) > 160):
+                filterImg[i][j] = 3
+            elif(int(dayImg[i][j]) - int(nightImg[i][j]) > 120):
+                filterImg[i][j] = 2
+            elif(int(dayImg[i][j]) - int(nightImg[i][j]) > 80):
                 filterImg[i][j] = 1
+            
 
             
     filterImg = filterImg.astype(np.uint8)
