@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import glob
 import numpy as np
 import time
+from sklearn.metrics import confusion_matrix
 
 
 def load_dataset(image_dir):
@@ -72,9 +73,13 @@ def thresholdTest(im_list, isNight, averagesArray, filterImg, isFilter):
             imgAverageThreshold = 75
             allAverageThreshold = 100
         else:
-            imgAverageThreshold = 54
-            allAverageThreshold = 25
-
+            # 1 2 3 4 5 filter----------------------
+            #imgAverageThreshold = 54
+            #allAverageThreshold = 25
+            # 1 2 3 4 5 6 7 8 9 filter -------------------
+            imgAverageThreshold = 120
+            allAverageThreshold = 65
+        
         if(isNight == True):
             if(imgAverage > allMax):
                 allMax = imgAverage
@@ -109,9 +114,13 @@ def thresholdTest(im_list, isNight, averagesArray, filterImg, isFilter):
     return averagesArray
     
 
-def histogramGenerator(nightAveragesArray, dayAveragesArray):
-    plt.hist(nightAveragesArray, bins=255, range=[0,255])
-    plt.hist(dayAveragesArray, bins=255, range=[0,255])
+def histogramGenerator(nightAveragesArray, dayAveragesArray, isFilter):
+    if not isFilter:
+        plt.hist(nightAveragesArray, bins=255, range=[0,255])
+        plt.hist(dayAveragesArray, bins=255, range=[0,255])
+    else:
+        plt.hist(nightAveragesArray, bins=2295, range=[0,2295])
+        plt.hist(dayAveragesArray, bins=2295, range=[0,2295])
 
     plt.show()
     
@@ -211,7 +220,7 @@ if not isDataReady:
             
     
     if not isDisplay:
-        histogramGenerator(nightAveragesArray, dayAveragesArray)
+        histogramGenerator(nightAveragesArray, dayAveragesArray, isFilter)
     else:
         nightTotalImgAverage, dayTotalImgAverage = averageImgDisplay(nightImageArray, nightImageCount, dayImageArray, dayImageCount)
 
