@@ -90,3 +90,49 @@ Total Number of Pictures = 36.492
 nightError: 0 dayError = 243
 Error -> %0,665899375
 ------------------------------------------------------------------
+
+with 123456789 filter
+
+average:  40.803996576401524
+NIGHT
+6504  ,  ./Dataset/Gece/1/stereo/centre/1418755834105622.png  ,  108.70418945312501
+nightErrorCount:  0
+6505 Photos in  129.86792135238647 seconds
+
+average:  46.32683380357552
+NIGHT
+5999  ,  ./Dataset/Gece3/1/stereo/centre/1425062229696515.png  ,  82.57577962239584
+nightErrorCount:  0
+6000 Photos in  122.11852765083313 seconds
+
+average:  63.48489487033414
+NIGHT
+5999  ,  ./Dataset/Gece4/1/stereo/centre/1418236483123017.png  ,  118.62029866536459
+nightErrorCount:  0
+6000 Photos in  120.08039426803589 seconds
+
+average:  240.5623334051857
+DAY
+5986  ,  ./Dataset/gunduz2/1/stereo/centre/1403622367533364.png  ,  88.7185441080729
+dayErrorCount:  39
+5987 Photos in  109.3067684173584 seconds
+
+average:  222.91369372219566
+DAY
+5999  ,  ./Dataset/gunduz3/1/stereo/centre/1403776843458220.png  ,  83.9103263346354
+dayErrorCount:  87
+6000 Photos in  110.79896354675293 seconds
+
+average:  242.4320626178653
+DAY
+5999  ,  ./Dataset/gunduz4/1/stereo/centre/1405353753153288.png  ,  65.3897412109375
+dayErrorCount:  42
+6000 Photos in  107.07398271560669 seconds
+
+------------------------------------------------------------------
+imgAverageThreshold = 120
+allAverageThreshold = 65
+Total Number of Pictures = 36.492
+nightError: 0 dayError = 168
+Error -> %0,460374877
+------------------------------------------------------------------
