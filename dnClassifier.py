@@ -172,7 +172,7 @@ def displayImages(nightTotalImgAverage, dayTotalImgAverage):
 # im_list_array = ["../../../../Volumes/Bariscan/Dataset/Gece/1/stereo/centre", "../../../../Volumes/Bariscan/Dataset/sample/stereo/centre", "../../../../Volumes/Bariscan/Dataset/gunduz1/Centre"]
 im_list_array = ["./Dataset/Gece/1/stereo/centre", "./Dataset/Gece3/1/stereo/centre", "./Dataset/Gece4/1/stereo/centre", "./Dataset/gunduz2/1/stereo/centre", "./Dataset/gunduz3/1/stereo/centre", "./Dataset/gunduz4/1/stereo/centre"]
 
-filterImg = (glob.glob("./Test_results/filterImg.png")) 
+filterImg = (glob.glob("./Test_results/filterImgNine.png")) 
 
 nightAveragesArray = []
 dayAveragesArray = []
