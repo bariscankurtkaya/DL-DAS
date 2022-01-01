@@ -26,7 +26,13 @@ def averageCalculationWithNumpy(img):
     #print(x)
     return x
 
-
+def averageCalculationWithoutZeros(img):
+    averageRow = np.true_divide(img.sum(1), (img != 0).sum(1)) #Inside of the sum is representing dimension
+    x = np.nanmean(averageRow, axis = 0)
+    #print(averageRow, x)
+    return x
+    
+    
 def totalImageCalculator(im_list, imgArray):
     tic = time.time()
     
@@ -64,21 +70,25 @@ def thresholdTest(im_list, isNight, averagesArray, filterImg, isFilter):
             img = img.astype(int)
             filterImg = filterImg.astype(int)
             img = np.multiply(img, filterImg)
+            imgAverage = averageCalculationWithoutZeros(img)
+        else:
+            imgAverage = averageCalculationWithNumpy(img)   #Without Filter
         
-        imgAverage = averageCalculationWithNumpy(img)
         averagesArray.append(imgAverage)
         allSum += imgAverage
         
         if not isFilter:
+            # Without Filter and averageCalculationWithNumpy function
             imgAverageThreshold = 75
             allAverageThreshold = 100
         else:
-            # 1 2 3 4 5 filter----------------------
+            # 1 2 3 4 5 filter---------------------- averageCalculationWithNumpy function
             #imgAverageThreshold = 54
             #allAverageThreshold = 25
-            # 1 2 3 4 5 6 7 8 9 filter -------------------
-            imgAverageThreshold = 120
-            allAverageThreshold = 65
+            # 1 2 3 4 5 6 7 8 9 filter ------------------- averageCalculationWithNumpy function
+            imgAverageThreshold = 186
+            allAverageThreshold = 180
+            # 1 2 3 4 5 6 7 8 9 filter ------------------- averageCalculationWithoutZeros function
         
         if(isNight == True):
             if(imgAverage > allMax):
@@ -100,13 +110,13 @@ def thresholdTest(im_list, isNight, averagesArray, filterImg, isFilter):
 
     print("average: ", average)
     
-    if(average >= allAverageThreshold):
-        print("DAY")
+    if not isNight:
+        print("DAY", average >= allAverageThreshold)
         print(l, " , ", minName, " , ", allMin)
         print("dayErrorCount: ", dayErrorCount)
 
     else:
-        print("NIGHT")
+        print("NIGHT", average < allAverageThreshold)
         print(l, " , ", maxName, " , ", allMax)
         print("nightErrorCount: ", nightErrorCount)
     toc = time.time()
@@ -119,8 +129,8 @@ def histogramGenerator(nightAveragesArray, dayAveragesArray, isFilter):
         plt.hist(nightAveragesArray, bins=255, range=[0,255])
         plt.hist(dayAveragesArray, bins=255, range=[0,255])
     else:
-        plt.hist(nightAveragesArray, bins=2295, range=[0,2295])
-        plt.hist(dayAveragesArray, bins=2295, range=[0,2295])
+        plt.hist(nightAveragesArray, bins=2295, range=[0,500])
+        plt.hist(dayAveragesArray, bins=2295, range=[0,500])
 
     plt.show()
     
@@ -229,6 +239,8 @@ else:
     dayTotalImgAverage, nightTotalImgAverage = readyAverageData()
     displayImages(nightTotalImgAverage, dayTotalImgAverage)
 
+print("night: ", len(nightAveragesArray))
+print("day: ", len(dayAveragesArray))
 
 #saveArrayAsImage(nightTotalImgAverage, "nightAverage.png")
 #saveArrayAsImage(dayTotalImgAverage, "dayAverage.png")
