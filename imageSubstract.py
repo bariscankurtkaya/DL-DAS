@@ -20,8 +20,8 @@ def imageSubstraction(dayImg, nightImg):
         print("same2")
 
 
-    cv2.imwrite("./Test_results/daySubstractNight.png", daySubstractNightImg)
-    cv2.imwrite("./Test_results/nightSubstractDay.png", nightSubstractDayImg)
+    cv2.imwrite("./Test_results/dayDifferenceSubstractNight.png", daySubstractNightImg)
+    cv2.imwrite("./Test_results/nightDifferenceSubstractDay.png", nightSubstractDayImg)
 
 
 def createFilter(dayImg, nightImg):
@@ -31,26 +31,27 @@ def createFilter(dayImg, nightImg):
         for j in range(len(dayImg[i])):
             if(int(dayImg[i][j]) - int(nightImg[i][j]) > 245):
                 filterImg[i][j] = 9
-            elif(int(dayImg[i][j]) - int(nightImg[i][j]) > 235):
+            elif(int(dayImg[i][j]) - int(nightImg[i][j]) > 230):
                 filterImg[i][j] = 8
             elif(int(dayImg[i][j]) - int(nightImg[i][j]) > 210):
                 filterImg[i][j] = 7
             elif(int(dayImg[i][j]) - int(nightImg[i][j]) > 190):
                 filterImg[i][j] = 6
-            elif(int(dayImg[i][j]) - int(nightImg[i][j]) > 160):
+            elif(int(dayImg[i][j]) - int(nightImg[i][j]) > 170):
                 filterImg[i][j] = 5
-            elif(int(dayImg[i][j]) - int(nightImg[i][j]) > 130):
+            elif(int(dayImg[i][j]) - int(nightImg[i][j]) > 140):
                 filterImg[i][j] = 4
-            elif(int(dayImg[i][j]) - int(nightImg[i][j]) > 100):
+            elif(int(dayImg[i][j]) - int(nightImg[i][j]) > 120):
                 filterImg[i][j] = 3
-            elif(int(dayImg[i][j]) - int(nightImg[i][j]) > 70):
+            elif(int(dayImg[i][j]) - int(nightImg[i][j]) > 90):
                 filterImg[i][j] = 2
-            elif(int(dayImg[i][j]) - int(nightImg[i][j]) > 40):
+            elif(int(dayImg[i][j]) - int(nightImg[i][j]) > 60):
                 filterImg[i][j] = 1
+
 
             
     filterImg = filterImg.astype(np.uint8)
-    cv2.imwrite("./Test_results/filterImg.png", filterImg)
+    cv2.imwrite("./Test_results/differenceFilterImg.png", filterImg)
     return filterImg
     
     
@@ -58,8 +59,8 @@ def createFilter(dayImg, nightImg):
     
     
 ################# ALGORITHM ################
-dayAveragePhoto = (glob.glob("./Test_results/dayAverage.png")) 
-nightAveragePhoto = (glob.glob("./Test_results/nightAverage.png")) 
+dayAveragePhoto = (glob.glob("./Test_results/differenceDayAverage.png")) 
+nightAveragePhoto = (glob.glob("./Test_results/differenceNightAverage.png")) 
 
 dayImg = cv2.imread(dayAveragePhoto[0] , cv2.IMREAD_UNCHANGED)
 nightImg = cv2.imread(nightAveragePhoto[0] , cv2.IMREAD_UNCHANGED)
