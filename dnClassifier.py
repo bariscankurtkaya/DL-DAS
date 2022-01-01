@@ -35,14 +35,18 @@ def averageCalculationWithoutZeros(img):
     
 def totalImageCalculator(im_list, imgArray):
     tic = time.time()
+    differencePhotoCount = 0
     
     for l in range(len(im_list)):
         img = cv2.imread(im_list[l] , cv2.IMREAD_UNCHANGED)
-        imgArray = np.add(imgArray,img)
+        average = averageCalculationWithNumpy(img)
+        if(average > 35 and average < 97 ):
+            differencePhotoCount = differencePhotoCount + 1
+            imgArray = np.add(imgArray,img)
         
     toc = time.time()
-    print(str(len(im_list)), "Photos in ", str((toc-tic)), "seconds\n")
-    return imgArray;
+    print(str(differencePhotoCount), "Photos in ", str((toc-tic)), "seconds\n")
+    return imgArray, differencePhotoCount;
 
 
     
@@ -129,8 +133,8 @@ def histogramGenerator(nightAveragesArray, dayAveragesArray, isFilter):
         plt.hist(nightAveragesArray, bins=255, range=[0,255])
         plt.hist(dayAveragesArray, bins=255, range=[0,255])
     else:
-        plt.hist(nightAveragesArray, bins=2295, range=[0,500])
-        plt.hist(dayAveragesArray, bins=2295, range=[0,500])
+        plt.hist(nightAveragesArray, bins=500, range=[0,500])
+        plt.hist(dayAveragesArray, bins=500, range=[0,500])
 
     plt.show()
     
@@ -196,9 +200,9 @@ nightImageCount = 0
 dayImageCount = 0
 
 
-isDisplay = False
+isDisplay = True
 isDataReady = False
-isFilter = True
+isFilter = False
 
 if not isDataReady:
     for i in range(len(im_list_array)):
@@ -206,26 +210,27 @@ if not isDataReady:
         
         if "Gece" in im_list_array[i]:
             isNight = True
-            nightImageCount += len(im_list)
             
             if not isDisplay:
+                nightImageCount += len(im_list)
                 averagesArray = thresholdTest(im_list, isNight, nightAveragesArray, filterImg[0], isFilter)
                 nightAveragesArray += averagesArray
                 
             else:
-                nightImageArray = totalImageCalculator(im_list, nightImageArray)
-                
+                nightImageArray, differencePhotoCount = totalImageCalculator(im_list, nightImageArray)
+                nightImageCount += differencePhotoCount
+
         else:
             isNight = False
-            dayImageCount += len(im_list)
             
             if not isDisplay:
+                dayImageCount += len(im_list)
                 averagesArray = thresholdTest(im_list, isNight, dayAveragesArray, filterImg[0], isFilter)
                 dayAveragesArray += averagesArray
                 
             else:
-                dayImageArray = totalImageCalculator(im_list, dayImageArray)
-    
+                dayImageArray, differencePhotoCount = totalImageCalculator(im_list, dayImageArray)
+                dayImageCount += differencePhotoCount
             
             
     
@@ -239,8 +244,6 @@ else:
     dayTotalImgAverage, nightTotalImgAverage = readyAverageData()
     displayImages(nightTotalImgAverage, dayTotalImgAverage)
 
-print("night: ", len(nightAveragesArray))
-print("day: ", len(dayAveragesArray))
 
-#saveArrayAsImage(nightTotalImgAverage, "nightAverage.png")
-#saveArrayAsImage(dayTotalImgAverage, "dayAverage.png")
+saveArrayAsImage("differenceNightAverage.png", nightTotalImgAverage)
+saveArrayAsImage("differenceDayAverage.png", dayTotalImgAverage)
