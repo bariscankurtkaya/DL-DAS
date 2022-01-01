@@ -182,3 +182,49 @@ Total Number of Pictures = 36.492
 nightError: 0 dayError = 118
 Error -> %0,323358544
 ------------------------------------------------------------------
+
+With differenceFilterand without zeros
+
+average:  46.370604291869384
+NIGHT True
+6504  ,  ./Dataset/Gece/1/stereo/centre/1418755834043131.png  ,  124.21724646699379
+nightErrorCount:  1
+6505 Photos in  113.18986082077026 seconds
+
+average:  49.635081481339846
+NIGHT True
+5999  ,  ./Dataset/Gece3/1/stereo/centre/1425062229446549.png  ,  91.1997561074503
+nightErrorCount:  0
+6000 Photos in  105.20470380783081 seconds
+
+average:  62.405081350476294
+NIGHT True
+5999  ,  ./Dataset/Gece4/1/stereo/centre/1418236556363033.png  ,  125.93192750074901
+nightErrorCount:  1
+6000 Photos in  106.77820420265198 seconds
+
+average:  262.93505347104775
+DAY True
+5986  ,  ./Dataset/gunduz2/1/stereo/centre/1403622368908375.png  ,  123.40713059509511
+dayErrorCount:  1
+5987 Photos in  97.07385516166687 seconds
+
+average:  255.8120848433332
+DAY True
+5999  ,  ./Dataset/gunduz3/1/stereo/centre/1403776843458220.png  ,  135.2604330000947
+dayErrorCount:  0
+6000 Photos in  97.72897338867188 seconds
+
+average:  261.7183607502029
+DAY True
+5999  ,  ./Dataset/gunduz4/1/stereo/centre/1405353753278277.png  ,  61.58450001065569
+dayErrorCount:  27
+6000 Photos in  93.76882600784302 seconds
+
+------------------------------------------------------------------
+imgAverageThreshold = 124
+allAverageThreshold = 180
+Total Number of Pictures = 36.492
+nightError: 2 dayError = 28
+Error -> %0,079469473
+------------------------------------------------------------------

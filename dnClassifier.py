@@ -90,7 +90,7 @@ def thresholdTest(im_list, isNight, averagesArray, filterImg, isFilter):
             #imgAverageThreshold = 54
             #allAverageThreshold = 25
             # 1 2 3 4 5 6 7 8 9 filter ------------------- averageCalculationWithNumpy function
-            imgAverageThreshold = 186
+            imgAverageThreshold = 126
             allAverageThreshold = 180
             # 1 2 3 4 5 6 7 8 9 filter ------------------- averageCalculationWithoutZeros function
         
@@ -133,8 +133,8 @@ def histogramGenerator(nightAveragesArray, dayAveragesArray, isFilter):
         plt.hist(nightAveragesArray, bins=255, range=[0,255])
         plt.hist(dayAveragesArray, bins=255, range=[0,255])
     else:
-        plt.hist(nightAveragesArray, bins=500, range=[0,500])
-        plt.hist(dayAveragesArray, bins=500, range=[0,500])
+        plt.hist(nightAveragesArray, bins=400, range=[0,400])
+        plt.hist(dayAveragesArray, bins=400, range=[0,400])
 
     plt.show()
     
@@ -186,7 +186,7 @@ def displayImages(nightTotalImgAverage, dayTotalImgAverage):
 # im_list_array = ["../../../../Volumes/Bariscan/Dataset/Gece/1/stereo/centre", "../../../../Volumes/Bariscan/Dataset/sample/stereo/centre", "../../../../Volumes/Bariscan/Dataset/gunduz1/Centre"]
 im_list_array = ["./Dataset/Gece/1/stereo/centre", "./Dataset/Gece3/1/stereo/centre", "./Dataset/Gece4/1/stereo/centre", "./Dataset/gunduz2/1/stereo/centre", "./Dataset/gunduz3/1/stereo/centre", "./Dataset/gunduz4/1/stereo/centre"]
 
-filterImg = (glob.glob("./Test_results/filterImgNine.png")) 
+filterImg = (glob.glob("./Test_results/differenceFilterImg.png")) 
 
 nightAveragesArray = []
 dayAveragesArray = []
@@ -200,9 +200,9 @@ nightImageCount = 0
 dayImageCount = 0
 
 
-isDisplay = True
+isDisplay = False
 isDataReady = False
-isFilter = False
+isFilter = True
 
 if not isDataReady:
     for i in range(len(im_list_array)):
@@ -245,5 +245,5 @@ else:
     displayImages(nightTotalImgAverage, dayTotalImgAverage)
 
 
-saveArrayAsImage("differenceNightAverage.png", nightTotalImgAverage)
-saveArrayAsImage("differenceDayAverage.png", dayTotalImgAverage)
+#saveArrayAsImage("differenceNightAverage.png", nightTotalImgAverage)
+#saveArrayAsImage("differenceDayAverage.png", dayTotalImgAverage)
