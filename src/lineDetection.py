@@ -2,7 +2,6 @@ import glob
 import math
 import numpy as np
 import cv2 as cv
-from matplotlib import pyplot as plt
 
 
 def region_of_interest(img, vertices):
@@ -39,7 +38,7 @@ def create_long_lines(edges):
         for i in range(0, len(lines)):
             rho = lines[i][0][0]
             theta = lines[i][0][1]
-            if rho > 600 or rho <680:
+            if rho > 600 or rho < 680:
                 a = math.cos(theta)
                 b = math.sin(theta)
                 x0 = a * rho
