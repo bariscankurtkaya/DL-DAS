@@ -13,18 +13,91 @@ def region_of_interest(img, vertices):
     return masked_image
 
 
+def calculate_distance(x0, y0, x_mid, y_bottom):
+    distance = (x_mid - x0) * (x_mid - x0) + (y_bottom - y0) * (y_bottom - y0)
+    return distance
+
+
+def stretch_the_lines(l, height, width):
+    # line = [x0, y0, x1, y1]
+    x0 = l[0]
+    y0 = l[1]
+    x1 = l[2]
+    y1 = l[3]
+
+    if x0 != 0 and y0 != 0:
+        slope = (y0 - y1) / (x1 - x0)
+        bias = (height - y0) - (slope * x0)
+        if bias > 0:
+            x0 = 0
+            y0 = height - bias
+            if width * slope + bias < height:
+                x1 = width
+                y1 = height - (slope * width + bias)
+            else:
+                x1 = (height - bias) / slope
+                y1 = 0
+        else:
+            x0 = -bias / slope
+            y0 = height
+            if width * slope + bias < height:
+                x1 = width
+                y1 = height - (slope * width + bias)
+            else:
+                x1 = (height - bias) / slope
+                y1 = 0
+
+    x0 = round(x0)
+    y0 = round(y0)
+    y1 = round(y1)
+    x1 = round(x1)
+    return [x0, y0, x1, y1]
+
 # Added lines to image.
-def create_lines(edges):
+def create_lines(edges, height, width):
     probability_img = cv.cvtColor(edges, cv.COLOR_GRAY2BGR)
 
     linesP = cv.HoughLinesP(edges, 1, np.pi / 180, 50, None, 50, 10)
 
     if linesP is not None:
+        closest_left_point = [0, 0, 0, 0]
+        closest_left_distance = width * width + height * height
+
+        closest_right_point = [0, 0, 0, 0]
+        closest_right_distance = width * width + height * height
+
         for i in range(0, len(linesP)):
             l = linesP[i][0]
-            if abs(l[1] - l[3]) > 20:
-                # img, (x,y), (x,y), color, thickness,line_type
-                cv.line(probability_img, (l[0], l[1]), (l[2], l[3]), (0, 0, 255), 3, cv.LINE_AA)
+            x0 = l[0]
+            y0 = l[1]
+            x1 = l[2]
+            y1 = l[3]
+            if abs(y0 - y1) > 20 and y0 != height and x0 != width / 2:
+                distance = calculate_distance(x0, y0, width / 2, height)
+                if x0 < width / 2:
+                    if closest_left_distance > distance:
+                        closest_left_point = [x0, y0, x1, y1]
+                        closest_left_distance = distance
+                        print("left min: ", distance, closest_left_point)
+                    else:
+                        continue
+                else:
+                    if closest_right_distance > distance:
+                        closest_right_point = [x0, y0, x1, y1]
+                        closest_right_distance = distance
+                        print("right min: ", distance, closest_right_point)
+                    else:
+                        continue
+
+    closest_left_point = stretch_the_lines(closest_left_point, height, width)
+    closest_right_point = stretch_the_lines(closest_right_point, height, width)
+
+    cv.line(probability_img, (closest_left_point[0], closest_left_point[1]),
+            (closest_left_point[2], closest_left_point[3]), (0, 0, 255), 3,
+            cv.LINE_AA)
+    cv.line(probability_img, (closest_right_point[0], closest_right_point[1]),
+            (closest_right_point[2], closest_right_point[3]), (0, 0, 255), 3,
+            cv.LINE_AA)
 
     return probability_img
 
@@ -38,7 +111,7 @@ def create_long_lines(edges):
         for i in range(0, len(lines)):
             rho = lines[i][0][0]
             theta = lines[i][0][1]
-            if rho > 600 or rho < 680:
+            if theta < 1.2:
                 a = math.cos(theta)
                 b = math.sin(theta)
                 x0 = a * rho
@@ -80,6 +153,6 @@ if __name__ == "__main__":
     edges = cv.Canny(croppedImg, 180, 220, None, 3)
 
     hough_img = create_long_lines(edges)
-    hough_probability_img = create_lines(edges)
+    hough_probability_img = create_lines(edges, height, width)
 
     show_all_images(img, croppedImg, hough_img, hough_probability_img)
