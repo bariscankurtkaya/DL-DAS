@@ -2,6 +2,33 @@ import glob
 import math
 import numpy as np
 import cv2 as cv
+from PIL import Image
+
+left_arrow = cv.imread((glob.glob("../Dataset/left_arrow.jpeg"))[0], cv.IMREAD_UNCHANGED)
+right_arrow = cv.imread((glob.glob("../Dataset/right_arrow.png"))[0], cv.IMREAD_UNCHANGED)
+stop_sign = cv.imread((glob.glob("../Dataset/stop_sign.jpg"))[0], cv.IMREAD_UNCHANGED)
+
+left_arrow = cv.cvtColor(left_arrow, cv.COLOR_BGR2GRAY)
+right_arrow = cv.cvtColor(right_arrow, cv.COLOR_BGR2GRAY)
+stop_sign = cv.cvtColor(stop_sign, cv.COLOR_BGR2GRAY)
+
+res_left_arrow = cv.resize(left_arrow, dsize=(1280, 960), interpolation=cv.INTER_CUBIC)
+res_right_arrow = cv.resize(right_arrow, dsize=(1280, 960), interpolation=cv.INTER_CUBIC)
+res_stop_sign = cv.resize(stop_sign, dsize=(1280, 960), interpolation=cv.INTER_CUBIC)
+print(left_arrow.shape)
+print(res_left_arrow.shape)
+
+
+def check_and_import_image(img, closest_left_point, closest_right_point, height):
+    car_headlight_height = height - 200
+    if closest_left_point[1] < car_headlight_height < closest_right_point[3]:
+        img = np.concatenate((img, res_left_arrow), axis=1)
+    elif closest_left_point[1] > car_headlight_height > closest_right_point[3]:
+        img = np.concatenate((img, res_right_arrow), axis=1)
+    else:
+        img = np.concatenate((img, res_stop_sign), axis=1)
+
+    return img
 
 
 def region_of_interest(img, vertices):
@@ -24,7 +51,6 @@ def stretch_the_lines(l, height, width):
     y0 = l[1]
     x1 = l[2]
     y1 = l[3]
-
     if x0 != 0 and y0 != 0:
         slope = (y0 - y1) / (x1 - x0)
         bias = (height - y0) - (slope * x0)
@@ -53,8 +79,9 @@ def stretch_the_lines(l, height, width):
     x1 = round(x1)
     return [x0, y0, x1, y1]
 
+
 # Added lines to image.
-def create_lines(edges, height, width):
+def create_lines(edges, height, width, img):
     probability_img = cv.cvtColor(edges, cv.COLOR_GRAY2BGR)
 
     linesP = cv.HoughLinesP(edges, 1, np.pi / 180, 50, None, 50, 10)
@@ -92,14 +119,21 @@ def create_lines(edges, height, width):
     closest_left_point = stretch_the_lines(closest_left_point, height, width)
     closest_right_point = stretch_the_lines(closest_right_point, height, width)
 
-    cv.line(probability_img, (closest_left_point[0], closest_left_point[1]),
+    draw_lines(img, closest_left_point, closest_right_point)
+    draw_lines(probability_img, closest_left_point, closest_right_point)
+
+    new_img = check_and_import_image(img, closest_left_point, closest_right_point, height)
+    return [probability_img, new_img]
+
+
+def draw_lines(img, closest_left_point, closest_right_point):
+    cv.line(img, (closest_left_point[0], closest_left_point[1]),
             (closest_left_point[2], closest_left_point[3]), (0, 0, 255), 3,
             cv.LINE_AA)
-    cv.line(probability_img, (closest_right_point[0], closest_right_point[1]),
+    cv.line(img, (closest_right_point[0], closest_right_point[1]),
             (closest_right_point[2], closest_right_point[3]), (0, 0, 255), 3,
             cv.LINE_AA)
-
-    return probability_img
+    return img
 
 
 def create_long_lines(edges):
@@ -125,8 +159,8 @@ def create_long_lines(edges):
 def show_all_images(*imgs):
     cv.imshow("Source", imgs[0])
     cv.imshow("Cropped Source", imgs[1])
-    cv.imshow("Detected Lines (in red) - Standard Hough Line Transform", imgs[2])
-    cv.imshow("Detected Lines (in red) - Probabilistic Line Transform", imgs[3])
+    cv.imshow("Detected Lines (in red) - Probabilistic Line Transform", imgs[2])
+    cv.imshow("Result", imgs[3])
     cv.waitKey()
 
 
@@ -137,13 +171,13 @@ if __name__ == "__main__":
     img = cv.imread(img, cv.IMREAD_UNCHANGED)
 
     print(img.shape)
-    height = img.shape[0] - 200
+    height = img.shape[0]
     width = img.shape[1]
 
     region_of_interest_vertices = [
-        (0, height),
-        (width / 2, height / 2),
-        (width, height)
+        (0, height - 200),
+        (width / 2, (height - 200) / 2),
+        (width, (height - 200))
     ]
 
     roi = np.array([region_of_interest_vertices], np.int32)
@@ -152,7 +186,8 @@ if __name__ == "__main__":
     # Using canny edge detector and HoughLinesP to find road lines.
     edges = cv.Canny(croppedImg, 180, 220, None, 3)
 
-    hough_img = create_long_lines(edges)
-    hough_probability_img = create_lines(edges, height, width)
+    # hough_img = create_long_lines(edges)
+    [hough_probability_img, new_img] = create_lines(edges, height, width, img)
 
-    show_all_images(img, croppedImg, hough_img, hough_probability_img)
+    print(hough_probability_img.shape)
+    show_all_images(img, croppedImg, hough_probability_img, new_img)
