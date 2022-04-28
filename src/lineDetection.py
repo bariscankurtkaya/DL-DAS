@@ -20,7 +20,7 @@ print(res_left_arrow.shape)
 
 
 def check_and_import_image(img, closest_left_point, closest_right_point, height):
-    car_headlight_height = height - 200
+    car_headlight_height = height - 195
     if closest_left_point[1] < car_headlight_height < closest_right_point[3]:
         img = np.concatenate((img, res_left_arrow), axis=1)
     elif closest_left_point[1] > car_headlight_height > closest_right_point[3]:
@@ -51,7 +51,11 @@ def stretch_the_lines(l, height, width):
     y0 = l[1]
     x1 = l[2]
     y1 = l[3]
-    if x0 != 0 and y0 != 0:
+
+    if x1 == x0:
+        x0 = abs(x1 - 1)
+
+    if x0 != 0 and y0 != 0 and y0 > 550:
         slope = (y0 - y1) / (x1 - x0)
         bias = (height - y0) - (slope * x0)
         if bias > 0:
@@ -73,6 +77,7 @@ def stretch_the_lines(l, height, width):
                 x1 = (height - bias) / slope
                 y1 = 0
 
+    print(l, x0, x1, y0, y1)
     x0 = round(x0)
     y0 = round(y0)
     y1 = round(y1)
@@ -166,8 +171,9 @@ def show_all_images(*imgs):
 
 if __name__ == "__main__":
     # 1418755682251300, 1418755735119099, 1425062189701993, 1425062278502329
+    # Risky ones -> 1418236403008951, 1418236511931591, 1418236571236006, 1425062029911396, 1425062191889195, 1425062338806569
     # Getting image properties and crop it
-    img = (glob.glob("../Dataset/1425062278502329.png"))[0]
+    img = (glob.glob("../Dataset/1418755682251300.png"))[0]
     img = cv.imread(img, cv.IMREAD_UNCHANGED)
 
     print(img.shape)
