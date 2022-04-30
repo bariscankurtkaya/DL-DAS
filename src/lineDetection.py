@@ -172,7 +172,9 @@ def show_all_images(*imgs):
 if __name__ == "__main__":
     # 1418755682251300, 1418755735119099, 1425062189701993, 1425062278502329
     # Risky ones -> 1418236403008951, 1418236511931591, 1418236571236006, 1425062029911396, 1425062191889195, 1425062338806569
+    # "../Dataset/1418755682251300.png"
     # Getting image properties and crop it
+    # "/media/bkurtkaya/Barışcan HDD/darknet/build/darknet/x64/test/geceDeneme/YoloTest/1418755829356268.png"
     img = (glob.glob("../Dataset/1418755682251300.png"))[0]
     img = cv.imread(img, cv.IMREAD_UNCHANGED)
 
