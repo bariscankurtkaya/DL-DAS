@@ -5,9 +5,8 @@ import os
 import glob
 
 lut={}
-lut["ParkingLines"] =0
-lut["StraightLine"] =1
-lut["StopLine"]     =2
+lut["person"] = 0
+lut["carBumper"] = 2
 
 
 
