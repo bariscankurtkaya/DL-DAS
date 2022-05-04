@@ -22,10 +22,10 @@ if __name__ == "__main__":
     #print(xml_files)
     #delete_xml_files(xml_files)
     
-    train_count = len(txt_files) * 0.8
+    train_count = len(png_files) * 0.8
     train_count = round(train_count)
-    create_file_for_train(txt_files[:train_count], "train.txt")
-    create_file_for_train(txt_files[train_count:], "test.txt")
+    create_file_for_train(png_files[:train_count], "train.txt")
+    create_file_for_train(png_files[train_count:], "test.txt")
 
     print("Success" , train_count)
     
