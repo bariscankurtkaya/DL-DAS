@@ -105,6 +105,7 @@ def create_lines(edges, height, width, img):
             x1 = l[2]
             y1 = l[3]
             #arctan(y/x) > 20 || 30 derece üstü kontrolü yapılacak
+            #print(math.atan(y/x)* 57.2958) > 20 || 30
             if abs(y0 - y1) > 20 and y0 != height and x0 != width / 2:
                 distance = calculate_distance(x0, y0, width / 2, height)
                 if x0 < width / 2:
