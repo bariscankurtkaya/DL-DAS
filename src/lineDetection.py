@@ -7,7 +7,7 @@ from PIL import Image
 left_arrow = cv.imread((glob.glob("../Dataset/left_arrow.jpeg"))[0], cv.IMREAD_UNCHANGED)
 right_arrow = cv.imread((glob.glob("../Dataset/right_arrow.png"))[0], cv.IMREAD_UNCHANGED)
 stop_sign = cv.imread((glob.glob("../Dataset/stop_sign.jpg"))[0], cv.IMREAD_UNCHANGED)
-check_sign = cv.imread((glob.glob("../Dataset/check_sign.jpg"))[0], cv.IMREAD_UNCHANGED)
+check_sign = cv.imread((glob.glob("../Dataset/check_sign.jpeg"))[0], cv.IMREAD_UNCHANGED)
 
 left_arrow = cv.cvtColor(left_arrow, cv.COLOR_BGR2GRAY)
 right_arrow = cv.cvtColor(right_arrow, cv.COLOR_BGR2GRAY)
@@ -24,7 +24,7 @@ print(res_left_arrow.shape)
 
 
 def check_and_import_image(img, closest_left_point, closest_right_point, height):
-    car_headlight_height = height
+    car_headlight_height = height -195
     if closest_left_point[1] < car_headlight_height < closest_right_point[3]:
         img = np.concatenate((img, res_left_arrow), axis=1)
     elif closest_left_point[1] > car_headlight_height > closest_right_point[3]:
@@ -59,7 +59,7 @@ def stretch_the_lines(l, height, width):
     if x1 == x0:
         x0 = abs(x1 - 1)
 
-    if x0 != 0 and y0 != 0 and y0 > 550:
+    if x0 != 0 and y0 != 0:
         slope = (y0 - y1) / (x1 - x0)
         bias = (height - y0) - (slope * x0)
         if bias > 0:
@@ -181,7 +181,7 @@ if __name__ == "__main__":
     # "../Dataset/1418755682251300.png"
     # Getting image properties and crop it
     # "/media/bkurtkaya/Barışcan HDD/darknet/build/darknet/x64/test/geceDeneme/YoloTest/1418755829356268.png"
-    img = (glob.glob("../Dataset/gece1.1/1418755700623798.png"))[0]
+    img = (glob.glob("../Dataset/1425062278502329.png"))[0]
     img = cv.imread(img, cv.IMREAD_UNCHANGED)
 
     print(img.shape)
