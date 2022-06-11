@@ -7,26 +7,30 @@ from PIL import Image
 left_arrow = cv.imread((glob.glob("../Dataset/left_arrow.jpeg"))[0], cv.IMREAD_UNCHANGED)
 right_arrow = cv.imread((glob.glob("../Dataset/right_arrow.png"))[0], cv.IMREAD_UNCHANGED)
 stop_sign = cv.imread((glob.glob("../Dataset/stop_sign.jpg"))[0], cv.IMREAD_UNCHANGED)
+check_sign = cv.imread((glob.glob("../Dataset/check_sign.jpg"))[0], cv.IMREAD_UNCHANGED)
 
 left_arrow = cv.cvtColor(left_arrow, cv.COLOR_BGR2GRAY)
 right_arrow = cv.cvtColor(right_arrow, cv.COLOR_BGR2GRAY)
 stop_sign = cv.cvtColor(stop_sign, cv.COLOR_BGR2GRAY)
+check_sign = cv.cvtColor(check_sign, cv.COLOR_BGR2GRAY)
 
 res_left_arrow = cv.resize(left_arrow, dsize=(1280, 960), interpolation=cv.INTER_CUBIC)
 res_right_arrow = cv.resize(right_arrow, dsize=(1280, 960), interpolation=cv.INTER_CUBIC)
 res_stop_sign = cv.resize(stop_sign, dsize=(1280, 960), interpolation=cv.INTER_CUBIC)
+res_check_sign = cv.resize(check_sign, dsize=(1280, 960), interpolation=cv.INTER_CUBIC)
+
 print(left_arrow.shape)
 print(res_left_arrow.shape)
 
 
 def check_and_import_image(img, closest_left_point, closest_right_point, height):
-    car_headlight_height = height - 195
+    car_headlight_height = height
     if closest_left_point[1] < car_headlight_height < closest_right_point[3]:
         img = np.concatenate((img, res_left_arrow), axis=1)
     elif closest_left_point[1] > car_headlight_height > closest_right_point[3]:
         img = np.concatenate((img, res_right_arrow), axis=1)
     else:
-        img = np.concatenate((img, res_stop_sign), axis=1)
+        img = np.concatenate((img, res_check_sign), axis=1)
 
     return img
 
@@ -104,6 +108,8 @@ def create_lines(edges, height, width, img):
             y0 = l[1]
             x1 = l[2]
             y1 = l[3]
+            #arctan(y/x) > 20 || 30 derece üstü kontrolü yapılacak
+            #print(math.atan(y/x)* 57.2958) > 20 || 30
             if abs(y0 - y1) > 20 and y0 != height and x0 != width / 2:
                 distance = calculate_distance(x0, y0, width / 2, height)
                 if x0 < width / 2:
@@ -175,7 +181,7 @@ if __name__ == "__main__":
     # "../Dataset/1418755682251300.png"
     # Getting image properties and crop it
     # "/media/bkurtkaya/Barışcan HDD/darknet/build/darknet/x64/test/geceDeneme/YoloTest/1418755829356268.png"
-    img = (glob.glob("../Dataset/1418755682251300.png"))[0]
+    img = (glob.glob("../Dataset/gece1.1/1418755700623798.png"))[0]
     img = cv.imread(img, cv.IMREAD_UNCHANGED)
 
     print(img.shape)
