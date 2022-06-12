@@ -4,6 +4,8 @@ from dnClassifier import DNClassifier
 import glob
 import cv2 as cv
 
+# classes = [carBumper = 0, person = 1]
+
 
 class App:
     def __init__(self):
@@ -14,16 +16,17 @@ class App:
     def testDNClassifier(self):
         return self.dn_classifier.thresholdTestForOneImage(self.img)
 
-    def selectTheDeepLearningModel(self, isNight):
-        coordinates = [250, 250, 500, 500]
-        if isNight:
+    def selectTheDeepLearningModel(self, is_night):
+        # predicted_coordinates = [class, probability, x0, y0, width, height]
+        predicted_coordinates = [0, 89, 250, 250, 500, 500]
+        if is_night:
             # selects the our model
             print("Our Model")
         else:
             # selects the YoloV4 coco model
             print("YoloV4 COCO")
 
-        return coordinates
+        return predicted_coordinates
 
 
 if __name__ == "__main__":
@@ -33,9 +36,9 @@ if __name__ == "__main__":
     # image will read
 
     # Then dnClassifier thresholdTestForOneImage function will called
-    isNight = app.testDNClassifier()
+    is_night = app.testDNClassifier()
 
     # Deep Learning model selection and class coordinate return
-    coordinates = app.selectTheDeepLearningModel()
+    coordinates = app.selectTheDeepLearningModel(is_night)
 
-
+    #
