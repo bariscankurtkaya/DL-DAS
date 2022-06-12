@@ -4,6 +4,8 @@ import numpy as np
 import cv2 as cv
 from PIL import Image
 
+rad_to_degree = 57.2958
+
 left_arrow = cv.imread((glob.glob("../Dataset/left_arrow.jpeg"))[0], cv.IMREAD_UNCHANGED)
 right_arrow = cv.imread((glob.glob("../Dataset/right_arrow.png"))[0], cv.IMREAD_UNCHANGED)
 stop_sign = cv.imread((glob.glob("../Dataset/stop_sign.jpg"))[0], cv.IMREAD_UNCHANGED)
@@ -24,7 +26,7 @@ print(res_left_arrow.shape)
 
 
 def check_and_import_image(img, closest_left_point, closest_right_point, height):
-    car_headlight_height = height -195
+    car_headlight_height = height - 195
     if closest_left_point[1] < car_headlight_height < closest_right_point[3]:
         img = np.concatenate((img, res_left_arrow), axis=1)
     elif closest_left_point[1] > car_headlight_height > closest_right_point[3]:
@@ -110,7 +112,7 @@ def create_lines(edges, height, width, img):
             y1 = l[3]
             #arctan(y/x) > 20 || 30 derece üstü kontrolü yapılacak
             #print(math.atan(y/x)* 57.2958) > 20 || 30
-            if abs(y0 - y1) > 20 and y0 != height and x0 != width / 2:
+            if abs(math.atan((y1-y0)/(x1-x0))* rad_to_degree) > 10 and y0 != height and x0 != width / 2:
                 distance = calculate_distance(x0, y0, width / 2, height)
                 if x0 < width / 2:
                     if closest_left_distance > distance:
