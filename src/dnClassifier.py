@@ -190,7 +190,9 @@ class DNClassifier:
 
     ######################### ALGORITHM ##########################
 
-    def wholeDatabaseTest(self):
+
+if __name__ == "__main__":
+        dn_classifier = DNClassifier()
         # For MacOs
         # im_list_array = ["../../../../Volumes/Bariscan/Dataset/Gece/1/stereo/centre", "../../../../Volumes/Bariscan/Dataset/sample/stereo/centre", "../../../../Volumes/Bariscan/Dataset/gunduz1/Centre"]
         im_list_array = ["./Dataset/Gece/1/stereo/centre", "./Dataset/Gece3/1/stereo/centre",
@@ -212,18 +214,18 @@ class DNClassifier:
 
         if not isDataReady:
             for i in range(len(im_list_array)):
-                im_list = self.load_dataset(im_list_array[i])
+                im_list = dn_classifier.load_dataset(im_list_array[i])
 
                 if "Gece" in im_list_array[i]:
                     isNight = True
 
                     if not isDisplay:
                         nightImageCount += len(im_list)
-                        averagesArray = self.thresholdTest(im_list, isNight, nightAveragesArray, filterImg[0], isFilter)
+                        averagesArray = dn_classifier.thresholdTest(im_list, isNight, nightAveragesArray, dn_classifier.filterImg, isFilter)
                         nightAveragesArray += averagesArray
 
                     else:
-                        nightImageArray, differencePhotoCount = self.totalImageCalculator(im_list, nightImageArray)
+                        nightImageArray, differencePhotoCount = dn_classifier.totalImageCalculator(im_list, nightImageArray)
                         nightImageCount += differencePhotoCount
 
                 else:
@@ -231,23 +233,23 @@ class DNClassifier:
 
                     if not isDisplay:
                         dayImageCount += len(im_list)
-                        averagesArray = self.thresholdTest(im_list, isNight, dayAveragesArray, filterImg[0], isFilter)
+                        averagesArray = dn_classifier.thresholdTest(im_list, isNight, dayAveragesArray, dn_classifier.filterImg, isFilter)
                         dayAveragesArray += averagesArray
 
                     else:
-                        dayImageArray, differencePhotoCount = self.totalImageCalculator(im_list, dayImageArray)
+                        dayImageArray, differencePhotoCount = dn_classifier.totalImageCalculator(im_list, dayImageArray)
                         dayImageCount += differencePhotoCount
 
             if not isDisplay:
-                self.histogramGenerator(nightAveragesArray, dayAveragesArray, isFilter)
+                dn_classifier.histogramGenerator(nightAveragesArray, dayAveragesArray, isFilter)
             else:
-                nightTotalImgAverage, dayTotalImgAverage = self.averageImgDisplay(nightImageArray, nightImageCount,
+                nightTotalImgAverage, dayTotalImgAverage = dn_classifier.averageImgDisplay(nightImageArray, nightImageCount,
                                                                                   dayImageArray, dayImageCount)
 
         else:
 
-            dayTotalImgAverage, nightTotalImgAverage = self.readyAverageData()
-            self.displayImages(nightTotalImgAverage, dayTotalImgAverage)
+            dayTotalImgAverage, nightTotalImgAverage = dn_classifier.readyAverageData()
+            dn_classifier.displayImages(nightTotalImgAverage, dayTotalImgAverage)
 
         # saveArrayAsImage("differenceNightAverage.png", nightTotalImgAverage)
         # saveArrayAsImage("differenceDayAverage.png", dayTotalImgAverage)

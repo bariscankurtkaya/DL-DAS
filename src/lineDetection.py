@@ -24,9 +24,12 @@ print(left_arrow.shape)
 print(res_left_arrow.shape)
 
 
-class LineDetection:
+class LaneDetection:
     def __init__(self):
-        return
+        self.predicted_coordinates = []
+        self.height = 0
+        self.width = 0
+        self.img = img
 
     def check_and_import_image(self, img, closest_left_point, closest_right_point, height):
         car_headlight_height = height - 195
@@ -63,6 +66,7 @@ class LineDetection:
 
         if x0 != 0 and y0 != 0:
             slope = (y0 - y1) / (x1 - x0)
+            print("slope:", slope)
             bias = (height - y0) - (slope * x0)
             if bias > 0:
                 x0 = 0
@@ -91,7 +95,10 @@ class LineDetection:
         return [x0, y0, x1, y1]
 
     # Added lines to image.
-    def create_lines(self, edges, height, width, img):
+    def create_lines(self, edges, img):
+        height = self.height
+        width = self.width
+
         probability_img = cv.cvtColor(edges, cv.COLOR_GRAY2BGR)
 
         linesP = cv.HoughLinesP(edges, 1, np.pi / 180, 50, None, 50, 10)
@@ -135,7 +142,7 @@ class LineDetection:
         self.draw_lines(probability_img, closest_left_point, closest_right_point)
 
         new_img = self.check_and_import_image(img, closest_left_point, closest_right_point, height)
-        return [probability_img, new_img]
+        return [img, closest_left_point, closest_right_point, height]
 
     def draw_lines(self, img, closest_left_point, closest_right_point):
         cv.line(img, (closest_left_point[0], closest_left_point[1]),
@@ -168,27 +175,21 @@ class LineDetection:
     def show_all_images(self, *imgs):
         cv.imshow("Source", imgs[0])
         cv.imshow("Cropped Source", imgs[1])
-        cv.imshow("Detected Lines (in red) - Probabilistic Line Transform", imgs[2])
-        cv.imshow("Result", imgs[3])
+        #cv.imshow("Detected Lines (in red) - Probabilistic Line Transform", imgs[2])
+        cv.imshow("Result", imgs[2])
         cv.waitKey()
 
-    def main(self):
-        # 1418755682251300, 1418755735119099, 1425062189701993, 1425062278502329
-        # Risky ones -> 1418236403008951, 1418236511931591, 1418236571236006, 1425062029911396, 1425062191889195, 1425062338806569
-        # "../Dataset/1418755682251300.png"
-        # Getting image properties and crop it
-        # "/media/bkurtkaya/Barışcan HDD/darknet/build/darknet/x64/test/geceDeneme/YoloTest/1418755829356268.png"
-        img = (glob.glob("../Dataset/1425062278502329.png"))[0]
-        img = cv.imread(img, cv.IMREAD_UNCHANGED)
-
+    def main(self, img, predicted_coordinates, isPreview):
+        self.predicted_coordinates = predicted_coordinates
+        self.img = img
         print(img.shape)
-        height = img.shape[0]
-        width = img.shape[1]
+        self.height = img.shape[0]
+        self.width = img.shape[1]
 
         region_of_interest_vertices = [
-            (0, height - 200),
-            (width / 2, (height - 200) / 2),
-            (width, (height - 200))
+            (0, self.height - 200),
+            (self.width / 2, (self.height - 200) / 2),
+            (self.width, (self.height - 200))
         ]
 
         roi = np.array([region_of_interest_vertices], np.int32)
@@ -198,7 +199,25 @@ class LineDetection:
         edges = cv.Canny(croppedImg, 180, 220, None, 3)
 
         # hough_img = create_long_lines(edges)
-        [hough_probability_img, new_img] = self.create_lines(edges, height, width, img)
+        [self.img, closest_left_point, closest_right_point, height] = self.create_lines(edges, img)
 
-        print(hough_probability_img.shape)
-        self.show_all_images(img, croppedImg, hough_probability_img, new_img)
+        new_img = self.check_and_import_image(self.img, closest_left_point, closest_right_point, height)
+
+        if isPreview:
+            #print(hough_probability_img.shape)
+            self.show_all_images(self.img, croppedImg, new_img)
+
+
+if __name__ == "__main__":
+    # 1418755682251300, 1418755735119099, 1425062189701993, 1425062278502329
+    # Risky ones -> 1418236403008951, 1418236511931591, 1418236571236006, 1425062029911396, 1425062191889195, 1425062338806569
+    # "../Dataset/1418755682251300.png"
+    # Getting image properties and crop it
+    # "/media/bkurtkaya/Barışcan HDD/darknet/build/darknet/x64/test/geceDeneme/YoloTest/1418755829356268.png"
+    img = (glob.glob("../Dataset/1418755682251300.png"))[0]
+    img = cv.imread(img, cv.IMREAD_UNCHANGED)
+    isPreview = True
+
+    predicted_coordinates = []
+    laneDetection = LaneDetection()
+    laneDetection.main(img, predicted_coordinates, isPreview)
