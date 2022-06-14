@@ -43,7 +43,6 @@ class LaneDetection:
         self.left_point = Point()
         self.right_point = Point()
 
-
     def check_and_import_image(self):
         car_headlight_height = self.height - 195
         if self.left_point.coordinates[1] < car_headlight_height < self.right_point.coordinates[3]:
@@ -53,12 +52,12 @@ class LaneDetection:
         else:
             self.img = np.concatenate((self.img, res_check_sign), axis=1)
 
-    def region_of_interest(self, img, vertices):
-        mask = np.zeros_like(img)
+    def region_of_interest(self, vertices):
+        mask = np.zeros_like(self.img)
         channel_count = 2
         match_mask_color = (255,) * channel_count
         cv.fillPoly(mask, vertices, match_mask_color)
-        masked_image = cv.bitwise_and(img, mask)
+        masked_image = cv.bitwise_and(self.img, mask)
         return masked_image
 
     def calculate_distance(self, x0, y0, x_mid, y_bottom):
@@ -209,7 +208,7 @@ class LaneDetection:
         ]
 
         roi = np.array([region_of_interest_vertices], np.int32)
-        croppedImg = self.region_of_interest(img, roi)
+        croppedImg = self.region_of_interest(roi)
 
         # Using canny edge detector and HoughLinesP to find road lines.
         edges = cv.Canny(croppedImg, 180, 220, None, 3)
@@ -229,8 +228,8 @@ if __name__ == "__main__":
     # "../Dataset/1418755682251300.png"
     # Getting image properties and crop it
     # "/media/bkurtkaya/Barışcan HDD/darknet/build/darknet/x64/test/geceDeneme/YoloTest/1418755829356268.png"
-    # img = (glob.glob("../Dataset/1418755682251300.png"))[0]
-    img = (glob.glob("/Volumes/Barışcan HDD/tubitak-2209/Dataset/1418236403008951.png"))[0]
+    img = (glob.glob("../Dataset/1418755682251300.png"))[0]
+    # img = (glob.glob("/Volumes/Barışcan HDD/tubitak-2209/Dataset/1418236403008951.png"))[0]
     img = cv.imread(img, cv.IMREAD_UNCHANGED)
     isPreview = True
 
