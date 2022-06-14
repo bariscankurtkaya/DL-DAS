@@ -16,7 +16,7 @@ def create_file_for_train(files, name):
 
 def delete_xml_files(xml_files):
     for i in range(len(xml_files)):
-        os.system("rm " + xlm_files[i])
+        os.system("rm " + xml_files[i])
 
 if __name__ == "__main__":
     #print(xml_files)
@@ -27,7 +27,7 @@ if __name__ == "__main__":
     create_file_for_train(png_files[:train_count], "train.txt")
     create_file_for_train(png_files[train_count:], "test.txt")
 
-    print("Success" , train_count)
+    print("Success", train_count)
     
     """
     for i in range(len(png_files)):

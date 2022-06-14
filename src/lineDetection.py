@@ -20,15 +20,16 @@ res_right_arrow = cv.resize(right_arrow, dsize=(1280, 960), interpolation=cv.INT
 res_stop_sign = cv.resize(stop_sign, dsize=(1280, 960), interpolation=cv.INTER_CUBIC)
 res_check_sign = cv.resize(check_sign, dsize=(1280, 960), interpolation=cv.INTER_CUBIC)
 
-print(left_arrow.shape)
-print(res_left_arrow.shape)
+#print(left_arrow.shape)
+#print(res_left_arrow.shape)
 
 
 class Point(object):
     def __init__(self):
+        # [x0, y0, x1, y1]
         self.coordinates = [0, 0, 0, 0]
         self.slope = 0
-        self. bias = 0
+        self.bias = 0
 
 
 class LaneDetection:
@@ -38,7 +39,7 @@ class LaneDetection:
 
         self.height = 0
         self.width = 0
-        self.img = img
+        self.img = 0
 
         self.left_point = Point()
         self.right_point = Point()
@@ -76,7 +77,7 @@ class LaneDetection:
 
         if x0 != 0 and y0 != 0:
             slope = (y0 - y1) / (x1 - x0)
-            print("slope:", slope)
+            #print("slope:", slope)
             bias = (self.height - y0) - (slope * x0)
             if x0 < 640:
                 self.left_point.slope = slope
@@ -104,7 +105,7 @@ class LaneDetection:
                     x1 = (self.height - bias) / slope
                     y1 = 0
 
-        print(closestPoint, x0, x1, y0, y1)
+        #print(closestPoint, x0, x1, y0, y1)
         x0 = round(x0)
         y0 = round(y0)
         y1 = round(y1)
@@ -134,26 +135,26 @@ class LaneDetection:
                 x1 = l[2]
                 y1 = l[3]
                 # arctan(y/x) > 20 || 30 derece üstü kontrolü yapılacak
-                # print(math.atan(y/x)* 57.2958) > 20 || 30
+                # print(math.atan(y/x)* 57.2958) > 20 || 30
                 if abs(math.atan((y1 - y0) / (x1 - x0)) * rad_to_degree) > 10 and y0 != height and x0 != width / 2:
                     distance = self.calculate_distance(x0, y0, width / 2, height)
                     if x0 < width / 2:
                         if closest_left_distance > distance:
                             closest_left_point = [x0, y0, x1, y1]
                             closest_left_distance = distance
-                            print("left min: ", distance, closest_left_point)
+                            #print("left min: ", distance, closest_left_point)
                         else:
                             continue
                     else:
                         if closest_right_distance > distance:
                             closest_right_point = [x0, y0, x1, y1]
                             closest_right_distance = distance
-                            print("right min: ", distance, closest_right_point)
+                            #print("right min: ", distance, closest_right_point)
                         else:
                             continue
 
-        self.left_point.coordinates = self.stretch_the_lines(closest_left_point)
-        self.right_point.coordinates = self.stretch_the_lines(closest_right_point)
+            self.left_point.coordinates = self.stretch_the_lines(closest_left_point)
+            self.right_point.coordinates = self.stretch_the_lines(closest_right_point)
 
         self.draw_lines()
         # self.draw_lines(probability_img, closest_left_point, closest_right_point)
@@ -180,24 +181,73 @@ class LaneDetection:
                     b = math.sin(theta)
                     x0 = a * rho
                     y0 = b * rho
-                    pt1 = (int(x0 + 1000 * (-b)), int(y0 + 1000 * (a)))
-                    pt2 = (int(x0 - 1000 * (-b)), int(y0 - 1000 * (a)))
+                    pt1 = (int(x0 + 1000 * (-b)), int(y0 + 1000 * a))
+                    pt2 = (int(x0 - 1000 * (-b)), int(y0 - 1000 * a))
                     cv.line(cdst, pt1, pt2, (0, 0, 255), 3, cv.LINE_AA)
         return cdst
 
     def show_all_images(self, *imgs):
-        # cv.imshow("Source", imgs[0])
-        cv.imshow("Cropped Source", imgs[0])
+        cv.imshow("Source", imgs[0])
+        cv.imshow("Cropped Source", imgs[1])
         # cv.imshow("Detected Lines (in red) - Probabilistic Line Transform", imgs[2])
-        cv.imshow("Result", imgs[1])
+        cv.imshow("Result", self.img)
         cv.waitKey()
+
+    def check_cnn_predicted_objects(self):
+        for i in range(self.total_predicted_class_count):
+            cv.line(self.img, (self.cnn_predicted_coordinates[i][2], self.cnn_predicted_coordinates[i][3]),
+                    (self.cnn_predicted_coordinates[i][2] + round(self.cnn_predicted_coordinates[i][4]/2), self.cnn_predicted_coordinates[i][3] + self.cnn_predicted_coordinates[i][5]), (0, 0, 255), 3,
+                    cv.LINE_AA)
+
+        print("ls", self.left_point.slope, "lb", self.left_point.bias, "rs", self.right_point.slope, "rb", self.right_point.bias)
+
+        if abs(math.atan(self.left_point.slope) - math.atan(self.right_point.slope)) * rad_to_degree < 30 and abs(self.left_point.bias - self.right_point.bias) < 2000:
+            # Looks for whole img
+            for i in range(self.total_predicted_class_count):
+                cnn_class = self.cnn_predicted_coordinates[i][0]
+                cnn_class_prob = self.cnn_predicted_coordinates[i][1]
+                cnn_x0 = self.cnn_predicted_coordinates[i][2]
+                cnn_y0 = self.cnn_predicted_coordinates[i][3]
+                cnn_width = self.cnn_predicted_coordinates[i][4]
+                cnn_height = self.cnn_predicted_coordinates[i][5]
+
+                if cnn_width * cnn_height > 200*200 and cnn_class_prob > 75:
+                    print("LINE ERROR BUT WARNING FOR CAR")
+                else:
+                    print("LINE ERROR")
+        else:
+            # Looks for intersection point classes
+            for i in range(self.total_predicted_class_count):
+                cnn_class = self.cnn_predicted_coordinates[i][0]
+                cnn_class_prob = self.cnn_predicted_coordinates[i][1]
+                cnn_x0 = self.cnn_predicted_coordinates[i][2]
+                cnn_y0 = self.cnn_predicted_coordinates[i][3]
+                cnn_width = self.cnn_predicted_coordinates[i][4]
+                cnn_height = self.cnn_predicted_coordinates[i][5]
+
+                if self.intersection_check(cnn_x0, cnn_y0 + cnn_height, cnn_width):
+                    if cnn_width * cnn_height > 200 * 200 and cnn_class_prob > 75:
+                        print("STOP!")
+                    else:
+                        print(cnn_height * cnn_width)
+                        print("NO PROBLEM")
+                else:
+                    print("YOU SHOULD BE CAREFUL")
+
+    def intersection_check(self, x0, y0, cnn_width):
+        print("left", (self.left_point.slope * x0 - self.left_point.bias), "x0", x0, "y0", y0, "h-y0", self.height - y0, "right", (self.right_point.slope * x0 + self.right_point.bias))
+
+        if abs(self.left_point.slope * x0 + abs(self.left_point.bias)) >= self.height - y0 and abs(self.right_point.slope * x0 + abs(self.right_point.bias)) >= self.height - y0:
+            return True
+        else:
+            return False
 
     def main(self, img, cnn_predicted_coordinates, isPreview):
         self.cnn_predicted_coordinates = cnn_predicted_coordinates
         self.total_predicted_class_count = len(self.cnn_predicted_coordinates)
 
-        self.img = img
-        print(self.img.shape)
+        self.img = np.array(img)
+        #print(self.img.shape)
         self.height = img.shape[0]
         self.width = img.shape[1]
 
@@ -208,18 +258,19 @@ class LaneDetection:
         ]
 
         roi = np.array([region_of_interest_vertices], np.int32)
-        croppedImg = self.region_of_interest(roi)
+        cropped_img = self.region_of_interest(roi)
 
         # Using canny edge detector and HoughLinesP to find road lines.
-        edges = cv.Canny(croppedImg, 180, 220, None, 3)
+        edges = cv.Canny(cropped_img, 180, 220, None, 3)
 
         # hough_img = create_long_lines(edges)
         self.create_lines(edges)
         self.check_and_import_image()
 
+        self.check_cnn_predicted_objects()
         if isPreview:
             # print(hough_probability_img.shape)
-            self.show_all_images(croppedImg, self.img)
+            self.show_all_images(img, cropped_img)
 
 
 if __name__ == "__main__":

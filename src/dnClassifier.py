@@ -61,11 +61,10 @@ class DNClassifier:
         img = np.multiply(img, self.filterImg)
         imgAverage = self.averageCalculationWithoutZeros(img)
 
-        if(imgAverage < self.imgAverageThreshold):
+        if imgAverage < self.imgAverageThreshold:
             return True
         else:
             return False
-
 
     def thresholdTest(self, im_list, isNight, averagesArray, filterImg, isFilter):
         # x= 0
@@ -192,64 +191,66 @@ class DNClassifier:
 
 
 if __name__ == "__main__":
-        dn_classifier = DNClassifier()
-        # For MacOs
-        # im_list_array = ["../../../../Volumes/Bariscan/Dataset/Gece/1/stereo/centre", "../../../../Volumes/Bariscan/Dataset/sample/stereo/centre", "../../../../Volumes/Bariscan/Dataset/gunduz1/Centre"]
-        im_list_array = ["./Dataset/Gece/1/stereo/centre", "./Dataset/Gece3/1/stereo/centre",
-                         "./Dataset/Gece4/1/stereo/centre", "./Dataset/gunduz2/1/stereo/centre",
-                         "./Dataset/gunduz3/1/stereo/centre", "./Dataset/gunduz4/1/stereo/centre"]
+    dn_classifier = DNClassifier()
+    # For MacOs
+    # im_list_array = ["../../../../Volumes/Bariscan/Dataset/Gece/1/stereo/centre", "../../../../Volumes/Bariscan/Dataset/sample/stereo/centre", "../../../../Volumes/Bariscan/Dataset/gunduz1/Centre"]
+    im_list_array = ["./Dataset/Gece/1/stereo/centre", "./Dataset/Gece3/1/stereo/centre",
+                     "./Dataset/Gece4/1/stereo/centre", "./Dataset/gunduz2/1/stereo/centre",
+                     "./Dataset/gunduz3/1/stereo/centre", "./Dataset/gunduz4/1/stereo/centre"]
 
-        nightAveragesArray = []
-        dayAveragesArray = []
+    nightAveragesArray = []
+    dayAveragesArray = []
 
-        nightImageArray = np.array([0])  # It will keep all photographs average pixel by pixel
-        dayImageArray = np.array([0])
+    nightImageArray = np.array([0])  # It will keep all photographs average pixel by pixel
+    dayImageArray = np.array([0])
 
-        nightImageCount = 0
-        dayImageCount = 0
+    nightImageCount = 0
+    dayImageCount = 0
 
-        isDisplay = False
-        isDataReady = False
-        isFilter = True
+    isDisplay = False
+    isDataReady = False
+    isFilter = True
 
-        if not isDataReady:
-            for i in range(len(im_list_array)):
-                im_list = dn_classifier.load_dataset(im_list_array[i])
+    if not isDataReady:
+        for i in range(len(im_list_array)):
+            im_list = dn_classifier.load_dataset(im_list_array[i])
 
-                if "Gece" in im_list_array[i]:
-                    isNight = True
+            if "Gece" in im_list_array[i]:
+                isNight = True
 
-                    if not isDisplay:
-                        nightImageCount += len(im_list)
-                        averagesArray = dn_classifier.thresholdTest(im_list, isNight, nightAveragesArray, dn_classifier.filterImg, isFilter)
-                        nightAveragesArray += averagesArray
-
-                    else:
-                        nightImageArray, differencePhotoCount = dn_classifier.totalImageCalculator(im_list, nightImageArray)
-                        nightImageCount += differencePhotoCount
+                if not isDisplay:
+                    nightImageCount += len(im_list)
+                    averagesArray = dn_classifier.thresholdTest(im_list, isNight, nightAveragesArray,
+                                                                dn_classifier.filterImg, isFilter)
+                    nightAveragesArray += averagesArray
 
                 else:
-                    isNight = False
+                    nightImageArray, differencePhotoCount = dn_classifier.totalImageCalculator(im_list, nightImageArray)
+                    nightImageCount += differencePhotoCount
 
-                    if not isDisplay:
-                        dayImageCount += len(im_list)
-                        averagesArray = dn_classifier.thresholdTest(im_list, isNight, dayAveragesArray, dn_classifier.filterImg, isFilter)
-                        dayAveragesArray += averagesArray
-
-                    else:
-                        dayImageArray, differencePhotoCount = dn_classifier.totalImageCalculator(im_list, dayImageArray)
-                        dayImageCount += differencePhotoCount
-
-            if not isDisplay:
-                dn_classifier.histogramGenerator(nightAveragesArray, dayAveragesArray, isFilter)
             else:
-                nightTotalImgAverage, dayTotalImgAverage = dn_classifier.averageImgDisplay(nightImageArray, nightImageCount,
-                                                                                  dayImageArray, dayImageCount)
+                isNight = False
 
+                if not isDisplay:
+                    dayImageCount += len(im_list)
+                    averagesArray = dn_classifier.thresholdTest(im_list, isNight, dayAveragesArray,
+                                                                dn_classifier.filterImg, isFilter)
+                    dayAveragesArray += averagesArray
+
+                else:
+                    dayImageArray, differencePhotoCount = dn_classifier.totalImageCalculator(im_list, dayImageArray)
+                    dayImageCount += differencePhotoCount
+
+        if not isDisplay:
+            dn_classifier.histogramGenerator(nightAveragesArray, dayAveragesArray, isFilter)
         else:
+            nightTotalImgAverage, dayTotalImgAverage = dn_classifier.averageImgDisplay(nightImageArray, nightImageCount,
+                                                                                       dayImageArray, dayImageCount)
 
-            dayTotalImgAverage, nightTotalImgAverage = dn_classifier.readyAverageData()
-            dn_classifier.displayImages(nightTotalImgAverage, dayTotalImgAverage)
+    else:
 
-        # saveArrayAsImage("differenceNightAverage.png", nightTotalImgAverage)
-        # saveArrayAsImage("differenceDayAverage.png", dayTotalImgAverage)
+        dayTotalImgAverage, nightTotalImgAverage = dn_classifier.readyAverageData()
+        dn_classifier.displayImages(nightTotalImgAverage, dayTotalImgAverage)
+
+    # saveArrayAsImage("differenceNightAverage.png", nightTotalImgAverage)
+    # saveArrayAsImage("differenceDayAverage.png", dayTotalImgAverage)
