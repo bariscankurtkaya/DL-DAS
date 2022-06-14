@@ -16,24 +16,24 @@ class App:
         self.dn_classifier = DNClassifier()
         self.lane_detection = LaneDetection()
 
-        # predicted_coordinates = [class, probability, x0, y0, width, height]
-        self.predicted_coordinates = []
+        # cnn_predicted_coordinates = [[class, probability, x0, y0, width, height]]
+        self.cnn_predicted_coordinates = []
 
     def test_dn_lassifier(self):
         return self.dn_classifier.thresholdTestForOneImage(self.img)
 
-    def predict_coordinates(self, is_night):
+    def cnn_predicted_coordinates(self, is_night):
         if is_night:
             # selects the our model
             print("Our Model")
-            self.predicted_coordinates = [[0, 89, 250, 250, 500, 500], [1, 92, 100, 100, 400, 400]]
+            self.cnn_predicted_coordinates = [[0, 89, 250, 250, 500, 500], [1, 92, 100, 100, 400, 400]]
         else:
             # selects the YoloV4 coco model
             print("YoloV4 COCO")
-            self.predicted_coordinates = [[0, 60, 250, 250, 500, 500], [1, 88, 250, 250, 600, 600]]
+            self.cnn_predicted_coordinates = [[0, 60, 250, 250, 500, 500], [1, 88, 250, 250, 600, 600]]
 
     def img_lane_detection(self):
-        self.lane_detection.main(self.img, self.predicted_coordinates, self.is_ony_line_preview, )
+        self.lane_detection.main(self.img, self.cnn_predicted_coordinates, self.is_ony_line_preview, )
 
 
 if __name__ == "__main__":
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     is_night = app.test_dn_lassifier()
 
     # Deep Learning model selection and class coordinate return
-    app.predict_coordinates(is_night)
+    app.cnn_predicted_coordinates(is_night)
 
     # Calls lineDetection function
     app.img_lane_detection()

@@ -24,23 +24,34 @@ print(left_arrow.shape)
 print(res_left_arrow.shape)
 
 
+class Point(object):
+    def __init__(self):
+        self.coordinates = [0, 0, 0, 0]
+        self.slope = 0
+        self. bias = 0
+
+
 class LaneDetection:
     def __init__(self):
-        self.predicted_coordinates = []
+        self.cnn_predicted_coordinates = []
+        self.total_predicted_class_count = 0
+
         self.height = 0
         self.width = 0
         self.img = img
 
-    def check_and_import_image(self, img, closest_left_point, closest_right_point, height):
-        car_headlight_height = height - 195
-        if closest_left_point[1] < car_headlight_height < closest_right_point[3]:
-            img = np.concatenate((img, res_left_arrow), axis=1)
-        elif closest_left_point[1] > car_headlight_height > closest_right_point[3]:
-            img = np.concatenate((img, res_right_arrow), axis=1)
-        else:
-            img = np.concatenate((img, res_check_sign), axis=1)
+        self.left_point = Point()
+        self.right_point = Point()
 
-        return img
+
+    def check_and_import_image(self):
+        car_headlight_height = self.height - 195
+        if self.left_point.coordinates[1] < car_headlight_height < self.right_point.coordinates[3]:
+            self.img = np.concatenate((self.img, res_left_arrow), axis=1)
+        elif self.left_point.coordinates[1] > car_headlight_height > self.right_point.coordinates[3]:
+            self.img = np.concatenate((self.img, res_right_arrow), axis=1)
+        else:
+            self.img = np.concatenate((self.img, res_check_sign), axis=1)
 
     def region_of_interest(self, img, vertices):
         mask = np.zeros_like(img)
@@ -54,12 +65,12 @@ class LaneDetection:
         distance = (x_mid - x0) * (x_mid - x0) + (y_bottom - y0) * (y_bottom - y0)
         return distance
 
-    def stretch_the_lines(self, l, height, width):
+    def stretch_the_lines(self, closestPoint):
         # line = [x0, y0, x1, y1]
-        x0 = l[0]
-        y0 = l[1]
-        x1 = l[2]
-        y1 = l[3]
+        x0 = closestPoint[0]
+        y0 = closestPoint[1]
+        x1 = closestPoint[2]
+        y1 = closestPoint[3]
 
         if x1 == x0:
             x0 = abs(x1 - 1)
@@ -67,27 +78,34 @@ class LaneDetection:
         if x0 != 0 and y0 != 0:
             slope = (y0 - y1) / (x1 - x0)
             print("slope:", slope)
-            bias = (height - y0) - (slope * x0)
+            bias = (self.height - y0) - (slope * x0)
+            if x0 < 640:
+                self.left_point.slope = slope
+                self.left_point.bias = bias
+            else:
+                self.right_point.slope = slope
+                self.right_point.bias = bias
+
             if bias > 0:
                 x0 = 0
-                y0 = height - bias
-                if width * slope + bias < height:
-                    x1 = width
-                    y1 = height - (slope * width + bias)
+                y0 = self.height - bias
+                if self.width * slope + bias < self.height:
+                    x1 = self.width
+                    y1 = self.height - (slope * self.width + bias)
                 else:
-                    x1 = (height - bias) / slope
+                    x1 = (self.height - bias) / slope
                     y1 = 0
             else:
                 x0 = -bias / slope
-                y0 = height
-                if width * slope + bias < height:
-                    x1 = width
-                    y1 = height - (slope * width + bias)
+                y0 = self.height
+                if self.width * slope + bias < self.height:
+                    x1 = self.width
+                    y1 = self.height - (slope * self.width + bias)
                 else:
-                    x1 = (height - bias) / slope
+                    x1 = (self.height - bias) / slope
                     y1 = 0
 
-        print(l, x0, x1, y0, y1)
+        print(closestPoint, x0, x1, y0, y1)
         x0 = round(x0)
         y0 = round(y0)
         y1 = round(y1)
@@ -95,11 +113,11 @@ class LaneDetection:
         return [x0, y0, x1, y1]
 
     # Added lines to image.
-    def create_lines(self, edges, img):
+    def create_lines(self, edges):
         height = self.height
         width = self.width
 
-        probability_img = cv.cvtColor(edges, cv.COLOR_GRAY2BGR)
+        # probability_img = cv.cvtColor(edges, cv.COLOR_GRAY2BGR)
 
         linesP = cv.HoughLinesP(edges, 1, np.pi / 180, 50, None, 50, 10)
 
@@ -135,23 +153,19 @@ class LaneDetection:
                         else:
                             continue
 
-        closest_left_point = self.stretch_the_lines(closest_left_point, height, width)
-        closest_right_point = self.stretch_the_lines(closest_right_point, height, width)
+        self.left_point.coordinates = self.stretch_the_lines(closest_left_point)
+        self.right_point.coordinates = self.stretch_the_lines(closest_right_point)
 
-        self.draw_lines(img, closest_left_point, closest_right_point)
-        self.draw_lines(probability_img, closest_left_point, closest_right_point)
+        self.draw_lines()
+        # self.draw_lines(probability_img, closest_left_point, closest_right_point)
 
-        new_img = self.check_and_import_image(img, closest_left_point, closest_right_point, height)
-        return [img, closest_left_point, closest_right_point, height]
-
-    def draw_lines(self, img, closest_left_point, closest_right_point):
-        cv.line(img, (closest_left_point[0], closest_left_point[1]),
-                (closest_left_point[2], closest_left_point[3]), (0, 0, 255), 3,
+    def draw_lines(self):
+        cv.line(self.img, (self.left_point.coordinates[0], self.left_point.coordinates[1]),
+                (self.left_point.coordinates[2], self.left_point.coordinates[3]), (0, 0, 255), 3,
                 cv.LINE_AA)
-        cv.line(img, (closest_right_point[0], closest_right_point[1]),
-                (closest_right_point[2], closest_right_point[3]), (0, 0, 255), 3,
+        cv.line(self.img, (self.right_point.coordinates[0], self.right_point.coordinates[1]),
+                (self.right_point.coordinates[2], self.right_point.coordinates[3]), (0, 0, 255), 3,
                 cv.LINE_AA)
-        return img
 
     def create_long_lines(self, edges):
         cdst = cv.cvtColor(edges, cv.COLOR_GRAY2BGR)
@@ -173,16 +187,18 @@ class LaneDetection:
         return cdst
 
     def show_all_images(self, *imgs):
-        cv.imshow("Source", imgs[0])
-        cv.imshow("Cropped Source", imgs[1])
-        #cv.imshow("Detected Lines (in red) - Probabilistic Line Transform", imgs[2])
-        cv.imshow("Result", imgs[2])
+        # cv.imshow("Source", imgs[0])
+        cv.imshow("Cropped Source", imgs[0])
+        # cv.imshow("Detected Lines (in red) - Probabilistic Line Transform", imgs[2])
+        cv.imshow("Result", imgs[1])
         cv.waitKey()
 
-    def main(self, img, predicted_coordinates, isPreview):
-        self.predicted_coordinates = predicted_coordinates
+    def main(self, img, cnn_predicted_coordinates, isPreview):
+        self.cnn_predicted_coordinates = cnn_predicted_coordinates
+        self.total_predicted_class_count = len(self.cnn_predicted_coordinates)
+
         self.img = img
-        print(img.shape)
+        print(self.img.shape)
         self.height = img.shape[0]
         self.width = img.shape[1]
 
@@ -199,13 +215,12 @@ class LaneDetection:
         edges = cv.Canny(croppedImg, 180, 220, None, 3)
 
         # hough_img = create_long_lines(edges)
-        [self.img, closest_left_point, closest_right_point, height] = self.create_lines(edges, img)
-
-        new_img = self.check_and_import_image(self.img, closest_left_point, closest_right_point, height)
+        self.create_lines(edges)
+        self.check_and_import_image()
 
         if isPreview:
-            #print(hough_probability_img.shape)
-            self.show_all_images(self.img, croppedImg, new_img)
+            # print(hough_probability_img.shape)
+            self.show_all_images(croppedImg, self.img)
 
 
 if __name__ == "__main__":
@@ -214,10 +229,12 @@ if __name__ == "__main__":
     # "../Dataset/1418755682251300.png"
     # Getting image properties and crop it
     # "/media/bkurtkaya/Barışcan HDD/darknet/build/darknet/x64/test/geceDeneme/YoloTest/1418755829356268.png"
-    img = (glob.glob("../Dataset/1418755682251300.png"))[0]
+    # img = (glob.glob("../Dataset/1418755682251300.png"))[0]
+    img = (glob.glob("/Volumes/Barışcan HDD/tubitak-2209/Dataset/1418236403008951.png"))[0]
     img = cv.imread(img, cv.IMREAD_UNCHANGED)
     isPreview = True
 
-    predicted_coordinates = []
+    # cnn_predicted_coordinates = [[class, prob, x0, y0, width, height]]
+    cnn_predicted_coordinates = [[0, 90, 475, 425, 100, 75]]
     laneDetection = LaneDetection()
-    laneDetection.main(img, predicted_coordinates, isPreview)
+    laneDetection.main(img, cnn_predicted_coordinates, isPreview)
