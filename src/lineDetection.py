@@ -221,7 +221,7 @@ class LaneDetection:
                 cnn_width = self.cnn_predicted_coordinates[i][4]
                 cnn_height = self.cnn_predicted_coordinates[i][5]
 
-                if cnn_width * cnn_height > 200 * 200 and cnn_class_prob > 75:
+                if cnn_width * cnn_height >= 200 * 200 and cnn_class_prob > 75:
                     self.warning_no = 3
                     return
                 else:
@@ -236,7 +236,7 @@ class LaneDetection:
                 cnn_height = self.cnn_predicted_coordinates[i][5]
 
                 if self.intersection_check(cnn_x0, cnn_y0 + cnn_height, cnn_width):
-                    if cnn_width * cnn_height > 200 * 200 and cnn_class_prob > 75:
+                    if cnn_width * cnn_height >= 200 * 200 and cnn_class_prob > 75:
                         self.warning_no = 3
                     else:
                         self.warning_no = 2
