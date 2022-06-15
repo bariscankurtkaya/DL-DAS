@@ -31,7 +31,7 @@ class App:
             self.cnn_predicted_coordinates = [[0, 60, 250, 250, 500, 500], [1, 88, 250, 250, 600, 600]]
 
     def img_lane_detection(self, img):
-        cnn_predicted_coordinates = [[1, 88, 250, 250, 600, 600]]
+        cnn_predicted_coordinates = [[0, 88, 250, 250, 100, 100]]
 
         self.lane_detection.main(img, cnn_predicted_coordinates, self.is_ony_line_preview)
 

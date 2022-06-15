@@ -5,23 +5,20 @@ import cv2 as cv
 
 rad_to_degree = 57.2958
 
-left_arrow = cv.imread((glob.glob("../Dataset/left_arrow.jpeg"))[0], cv.IMREAD_UNCHANGED)
-right_arrow = cv.imread((glob.glob("../Dataset/right_arrow.png"))[0], cv.IMREAD_UNCHANGED)
-stop_sign = cv.imread((glob.glob("../Dataset/stop_sign.jpg"))[0], cv.IMREAD_UNCHANGED)
-check_sign = cv.imread((glob.glob("../Dataset/check_sign.jpeg"))[0], cv.IMREAD_UNCHANGED)
 
-left_arrow = cv.cvtColor(left_arrow, cv.COLOR_BGR2GRAY)
-right_arrow = cv.cvtColor(right_arrow, cv.COLOR_BGR2GRAY)
-stop_sign = cv.cvtColor(stop_sign, cv.COLOR_BGR2GRAY)
-check_sign = cv.cvtColor(check_sign, cv.COLOR_BGR2GRAY)
+def resize_img(img):
+    new_img = cv.imread((glob.glob(img))[0], cv.IMREAD_UNCHANGED)
+    new_img = cv.cvtColor(new_img, cv.COLOR_BGR2GRAY)
+    new_img = cv.resize(new_img, dsize=(1280, 960), interpolation=cv.INTER_CUBIC)
+    return new_img
 
-res_left_arrow = cv.resize(left_arrow, dsize=(1280, 960), interpolation=cv.INTER_CUBIC)
-res_right_arrow = cv.resize(right_arrow, dsize=(1280, 960), interpolation=cv.INTER_CUBIC)
-res_stop_sign = cv.resize(stop_sign, dsize=(1280, 960), interpolation=cv.INTER_CUBIC)
-res_check_sign = cv.resize(check_sign, dsize=(1280, 960), interpolation=cv.INTER_CUBIC)
 
-#print(left_arrow.shape)
-#print(res_left_arrow.shape)
+res_left_arrow = resize_img("../Dataset/left_arrow.jpeg")
+res_right_arrow = resize_img("../Dataset/right_arrow.png")
+res_stop_sign = resize_img("../Dataset/stop_sign.jpg")
+res_check_sign = resize_img("../Dataset/check_sign.jpeg")
+res_crosswalk_sign = resize_img("../Dataset/crosswalk_sign.webp")
+res_slow_sign = resize_img("../Dataset/slow_sign.jpeg")
 
 
 class Point(object):
@@ -44,14 +41,28 @@ class LaneDetection:
         self.left_point = Point()
         self.right_point = Point()
 
+        self.warning_no = 0
+
+    def concatenate_img(self, img):
+        self.img = np.concatenate((self.img, img), axis=1)
+
     def check_and_import_image(self):
-        car_headlight_height = self.height - 195
-        if self.left_point.coordinates[1] < car_headlight_height < self.right_point.coordinates[3]:
-            self.img = np.concatenate((self.img, res_left_arrow), axis=1)
-        elif self.left_point.coordinates[1] > car_headlight_height > self.right_point.coordinates[3]:
-            self.img = np.concatenate((self.img, res_right_arrow), axis=1)
-        else:
-            self.img = np.concatenate((self.img, res_check_sign), axis=1)
+        # warning_no: just_line = 0, person = 1, car_slow = 2, car_stop = 3
+
+        if self.warning_no == 0:
+            car_headlight_height = self.height - 195
+            if self.left_point.coordinates[1] < car_headlight_height < self.right_point.coordinates[3]:
+                self.concatenate_img(res_left_arrow)
+            elif self.left_point.coordinates[1] > car_headlight_height > self.right_point.coordinates[3]:
+                self.concatenate_img(res_right_arrow)
+            else:
+                self.concatenate_img(res_check_sign)
+        elif self.warning_no == 1:
+            self.concatenate_img(res_crosswalk_sign)
+        elif self.warning_no == 2:
+            self.concatenate_img(res_slow_sign)
+        elif self.warning_no == 3:
+            self.concatenate_img(res_stop_sign)
 
     def region_of_interest(self, vertices):
         mask = np.zeros_like(self.img)
@@ -77,7 +88,7 @@ class LaneDetection:
 
         if x0 != 0 and y0 != 0:
             slope = (y0 - y1) / (x1 - x0)
-            #print("slope:", slope)
+            # print("slope:", slope)
             bias = (self.height - y0) - (slope * x0)
             if x0 < 640:
                 self.left_point.slope = slope
@@ -105,7 +116,7 @@ class LaneDetection:
                     x1 = (self.height - bias) / slope
                     y1 = 0
 
-        #print(closestPoint, x0, x1, y0, y1)
+        # print(closestPoint, x0, x1, y0, y1)
         x0 = round(x0)
         y0 = round(y0)
         y1 = round(y1)
@@ -142,14 +153,14 @@ class LaneDetection:
                         if closest_left_distance > distance:
                             closest_left_point = [x0, y0, x1, y1]
                             closest_left_distance = distance
-                            #print("left min: ", distance, closest_left_point)
+                            # print("left min: ", distance, closest_left_point)
                         else:
                             continue
                     else:
                         if closest_right_distance > distance:
                             closest_right_point = [x0, y0, x1, y1]
                             closest_right_distance = distance
-                            #print("right min: ", distance, closest_right_point)
+                            # print("right min: ", distance, closest_right_point)
                         else:
                             continue
 
@@ -194,31 +205,30 @@ class LaneDetection:
         cv.waitKey()
 
     def check_cnn_predicted_objects(self):
-        for i in range(self.total_predicted_class_count):
-            cv.line(self.img, (self.cnn_predicted_coordinates[i][2], self.cnn_predicted_coordinates[i][3]),
-                    (self.cnn_predicted_coordinates[i][2] + round(self.cnn_predicted_coordinates[i][4]/2), self.cnn_predicted_coordinates[i][3] + self.cnn_predicted_coordinates[i][5]), (0, 0, 255), 3,
-                    cv.LINE_AA)
 
-        print("ls", self.left_point.slope, "lb", self.left_point.bias, "rs", self.right_point.slope, "rb", self.right_point.bias)
+        # print("ls", self.left_point.slope, "lb", self.left_point.bias, "rs", self.right_point.slope, "rb",
+        # self.right_point.bias)
+        for i in range(self.total_predicted_class_count):
+            cnn_class = self.cnn_predicted_coordinates[i][0]
+            if cnn_class == 1:
+                self.warning_no = 1
+                return
 
         if abs(math.atan(self.left_point.slope) - math.atan(self.right_point.slope)) * rad_to_degree < 30 and abs(self.left_point.bias - self.right_point.bias) < 2000:
             # Looks for whole img
             for i in range(self.total_predicted_class_count):
-                cnn_class = self.cnn_predicted_coordinates[i][0]
                 cnn_class_prob = self.cnn_predicted_coordinates[i][1]
-                cnn_x0 = self.cnn_predicted_coordinates[i][2]
-                cnn_y0 = self.cnn_predicted_coordinates[i][3]
                 cnn_width = self.cnn_predicted_coordinates[i][4]
                 cnn_height = self.cnn_predicted_coordinates[i][5]
 
-                if cnn_width * cnn_height > 200*200 and cnn_class_prob > 75:
-                    print("LINE ERROR BUT WARNING FOR CAR")
+                if cnn_width * cnn_height > 200 * 200 and cnn_class_prob > 75:
+                    self.warning_no = 3
+                    return
                 else:
-                    print("LINE ERROR")
+                    self.warning_no = 2
         else:
             # Looks for intersection point classes
             for i in range(self.total_predicted_class_count):
-                cnn_class = self.cnn_predicted_coordinates[i][0]
                 cnn_class_prob = self.cnn_predicted_coordinates[i][1]
                 cnn_x0 = self.cnn_predicted_coordinates[i][2]
                 cnn_y0 = self.cnn_predicted_coordinates[i][3]
@@ -227,17 +237,27 @@ class LaneDetection:
 
                 if self.intersection_check(cnn_x0, cnn_y0 + cnn_height, cnn_width):
                     if cnn_width * cnn_height > 200 * 200 and cnn_class_prob > 75:
-                        print("STOP!")
+                        self.warning_no = 3
                     else:
-                        print(cnn_height * cnn_width)
-                        print("NO PROBLEM")
+                        self.warning_no = 2
                 else:
-                    print("YOU SHOULD BE CAREFUL")
+                    self.warning_no = 0
 
     def intersection_check(self, x0, y0, cnn_width):
-        print("left", (self.left_point.slope * x0 - self.left_point.bias), "x0", x0, "y0", y0, "h-y0", self.height - y0, "right", (self.right_point.slope * x0 + self.right_point.bias))
+        # print("left", (self.left_point.slope * x0 - self.left_point.bias), "x0", x0, "y0", y0, "h-y0", self.height
+        # - y0, "right", (self.right_point.slope * x0 + self.right_point.bias))
 
-        if abs(self.left_point.slope * x0 + abs(self.left_point.bias)) >= self.height - y0 and abs(self.right_point.slope * x0 + abs(self.right_point.bias)) >= self.height - y0:
+        if self.left_point.slope * x0 + self.left_point.bias >= self.height - y0 and \
+                self.right_point.slope * x0 + self.right_point.bias >= self.height - y0:
+            # print("en sol")
+            return True
+        elif self.left_point.slope * (x0 + cnn_width / 2) + self.left_point.bias >= self.height - y0 and \
+                self.right_point.slope * (x0 + cnn_width / 2) + self.right_point.bias >= self.height - y0:
+            # print("orta")
+            return True
+        elif self.left_point.slope * (x0 + cnn_width) + self.left_point.bias >= self.height - y0 and \
+                self.right_point.slope * (x0 + cnn_width) + self.right_point.bias >= self.height - y0:
+            # print("en sağ")
             return True
         else:
             return False
@@ -245,9 +265,10 @@ class LaneDetection:
     def main(self, img, cnn_predicted_coordinates, isPreview):
         self.cnn_predicted_coordinates = cnn_predicted_coordinates
         self.total_predicted_class_count = len(self.cnn_predicted_coordinates)
+        self.warning_no = 0
 
         self.img = np.array(img)
-        #print(self.img.shape)
+        # print(self.img.shape)
         self.height = img.shape[0]
         self.width = img.shape[1]
 
@@ -265,9 +286,9 @@ class LaneDetection:
 
         # hough_img = create_long_lines(edges)
         self.create_lines(edges)
+        self.check_cnn_predicted_objects()
         self.check_and_import_image()
 
-        self.check_cnn_predicted_objects()
         if isPreview:
             # print(hough_probability_img.shape)
             self.show_all_images(img, cropped_img)
