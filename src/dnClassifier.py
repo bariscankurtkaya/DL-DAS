@@ -8,9 +8,9 @@ from sklearn.metrics import confusion_matrix
 
 class DNClassifier:
     def __init__(self):
-        self.filterImg = (glob.glob("../Test_results/differenceFilterImg.png"))[0]
-        self.filterImg = cv2.imread(self.filterImg, cv2.IMREAD_UNCHANGED)
-        self.filterImg = self.filterImg.astype(int)
+        self.filterImg = (glob.glob("../Test_results/differenceFilterImgExp.png"))[0]
+        #self.filterImg = cv2.imread(self.filterImg, cv2.IMREAD_UNCHANGED)
+        #self.filterImg = self.filterImg.astype(int)
 
         self.imgAverageThreshold = 126
         self.allAverageThreshold = 180
@@ -81,6 +81,7 @@ class DNClassifier:
         filterImg = cv2.imread(filterImg, cv2.IMREAD_UNCHANGED)
 
         for l in range(len(im_list)):
+            print(l)
             img = cv2.imread(im_list[l], cv2.IMREAD_UNCHANGED)
 
             # img = img[0:201,500:900]
@@ -109,6 +110,10 @@ class DNClassifier:
                 imgAverageThreshold = 126
                 allAverageThreshold = 180
                 # 1 2 3 4 5 6 7 8 9 filter ------------------- averageCalculationWithoutZeros function
+                # exp filter ------------------- averageCalculationWithNumpy function
+                #imgAverageThreshold = 126
+                #allAverageThreshold = 180
+                # exp filter ------------------- averageCalculationWithoutZeros function
 
             if (isNight == True):
                 if (imgAverage > allMax):
@@ -194,9 +199,9 @@ if __name__ == "__main__":
     dn_classifier = DNClassifier()
     # For MacOs
     # im_list_array = ["../../../../Volumes/Bariscan/Dataset/Gece/1/stereo/centre", "../../../../Volumes/Bariscan/Dataset/sample/stereo/centre", "../../../../Volumes/Bariscan/Dataset/gunduz1/Centre"]
-    im_list_array = ["./Dataset/Gece/1/stereo/centre", "./Dataset/Gece3/1/stereo/centre",
-                     "./Dataset/Gece4/1/stereo/centre", "./Dataset/gunduz2/1/stereo/centre",
-                     "./Dataset/gunduz3/1/stereo/centre", "./Dataset/gunduz4/1/stereo/centre"]
+    im_list_array = ["/media/bkurtkaya/Barışcan HDD/tubitak-2209/Dataset/Gece/1/stereo/centre", "/media/bkurtkaya/Barışcan HDD/tubitak-2209/Dataset/Gece3/1/stereo/centre",
+                     "/media/bkurtkaya/Barışcan HDD/tubitak-2209/Dataset/Gece4/1/stereo/centre", "/media/bkurtkaya/Barışcan HDD/tubitak-2209/Dataset/gunduz2/1/stereo/centre",
+                     "/media/bkurtkaya/Barışcan HDD/tubitak-2209/Dataset/gunduz3/1/stereo/centre", "/media/bkurtkaya/Barışcan HDD/tubitak-2209/Dataset/gunduz4/1/stereo/centre"]
 
     nightAveragesArray = []
     dayAveragesArray = []
