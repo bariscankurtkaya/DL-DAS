@@ -27,11 +27,14 @@ def imageSubstraction(dayImg, nightImg):
 def createFilter(dayImg, nightImg):
     filterImg = np.zeros((len(dayImg),len(dayImg[0])), dtype = type(dayImg[0][0]))
 
-    filterImg = np.exp((nightImg - dayImg)/128)
+    filterImg = np.exp((nightImg - dayImg)/16)
+    filterImg[filterImg<2.71] = 0
+    filterImg = filterImg / np.exp(8) #normalization
      
-    filterImg = np.round(filterImg)
-    filterImg = filterImg.astype(np.uint8)
-    cv2.imwrite("../Test_results/differenceFilterImgExp.png", filterImg)
+    #filterImg = np.round(filterImg)
+    #filterImg = filterImg.astype(np.uint8)
+    #cv2.imwrite("../Test_results/differenceFilterImgGreaterExp.png", filterImg)
+    np.savetxt("../Test_results/differenceFilterImgGreaterExp.csv", filterImg, delimiter=',')
     return filterImg
     
     

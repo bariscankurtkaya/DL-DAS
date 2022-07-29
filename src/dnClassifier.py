@@ -3,17 +3,18 @@ import matplotlib.pyplot as plt
 import glob
 import numpy as np
 import time
-from sklearn.metrics import confusion_matrix
+#from sklearn.metrics import confusion_matrix
 
 
 class DNClassifier:
     def __init__(self):
-        self.filterImg = (glob.glob("../Test_results/differenceFilterImgExp.png"))[0]
+        #self.filterImg = (glob.glob("../Test_results/differenceFilterImgGreaterExp.png"))[0]
         #self.filterImg = cv2.imread(self.filterImg, cv2.IMREAD_UNCHANGED)
         #self.filterImg = self.filterImg.astype(int)
+        self.filterImg = np.genfromtxt("../Test_results/differenceFilterImgGreaterExp.csv", delimiter=',')
 
-        self.imgAverageThreshold = 126
-        self.allAverageThreshold = 180
+        self.imgAverageThreshold = 0
+        self.allAverageThreshold = 0
 
         np.seterr(divide='ignore', invalid='ignore')
 
@@ -56,8 +57,10 @@ class DNClassifier:
         print(str(differencePhotoCount), "Photos in ", str((toc - tic)), "seconds\n")
         return imgArray, differencePhotoCount;
 
-    def thresholdTestForOneImage(self, img):
-        img = img.astype(int)
+    def thresholdTestForOneImage(self, img, isFilter):
+        img = img / 256
+        print(self.imgAverageThreshold)
+        #img = img.astype(int)
         img = np.multiply(img, self.filterImg)
         imgAverage = self.averageCalculationWithoutZeros(img)
 
@@ -66,31 +69,54 @@ class DNClassifier:
         else:
             return False
 
-    def thresholdTest(self, im_list, isNight, averagesArray, filterImg, isFilter):
+    def imageThresholdSelection(self, isFilter):
+        if not isFilter:
+            # Without Filter and averageCalculationWithNumpy function
+            self.imgAverageThreshold = 74
+            self.allAverageThreshold = 99
+        else:
+            # 0 2 3 4 5 filter---------------------- averageCalculationWithNumpy function
+            # imgAverageThreshold = 53
+            # allAverageThreshold = 24
+            # 0 2 3 4 5 6 7 8 9 filter ------------------- averageCalculationWithNumpy function
+            #imgAverageThreshold = 125
+            #allAverageThreshold = 179
+            # 0 2 3 4 5 6 7 8 9 filter ------------------- averageCalculationWithoutZeros function
+            # exp filter ------------------- averageCalculationWithNumpy function
+            #self.imgAverageThreshold = 300
+            #self.allAverageThreshold = 350
+            # exp filter ------------------- averageCalculationWithoutZeros function
+            # greater exp filter ------------------- averageCalculationWithNumpy function
+            # img/256 added in function below
+            self.imgAverageThreshold = 100
+            self.allAverageThreshold = 100
+            # greater exp filter ------------------- averageCalculationWithoutZeros function
+
+
+    def thresholdTest(self, im_list, isNight, averagesArray, isFilter):
         # x= 0
         allSum = 0
         average = 0
         allMax = 0
         maxName = ""
         allMin = 255
+        if(isFilter):
+            allMin = np.exp(16)
         minName = ""
         dayErrorCount = 0
         nightErrorCount = 0
 
         tic = time.time()
-        filterImg = cv2.imread(filterImg, cv2.IMREAD_UNCHANGED)
+
+        self.imageThresholdSelection(isFilter)
 
         for l in range(len(im_list)):
-            print(l)
             img = cv2.imread(im_list[l], cv2.IMREAD_UNCHANGED)
 
-            # img = img[0:201,500:900]
-            # imgAverage = averageCalculation(x,img)
-
             if isFilter:
-                img = img.astype(int)
-                filterImg = filterImg.astype(int)
-                img = np.multiply(img, filterImg)
+                img = img / 256
+                #img = img.astype(np.uint8)
+                img = np.multiply(img, self.filterImg)
                 imgAverage = self.averageCalculationWithoutZeros(img)
             else:
                 imgAverage = self.averageCalculationWithNumpy(img)  # Without Filter
@@ -98,35 +124,19 @@ class DNClassifier:
             averagesArray.append(imgAverage)
             allSum += imgAverage
 
-            if not isFilter:
-                # Without Filter and averageCalculationWithNumpy function
-                imgAverageThreshold = 75
-                allAverageThreshold = 100
-            else:
-                # 1 2 3 4 5 filter---------------------- averageCalculationWithNumpy function
-                # imgAverageThreshold = 54
-                # allAverageThreshold = 25
-                # 1 2 3 4 5 6 7 8 9 filter ------------------- averageCalculationWithNumpy function
-                imgAverageThreshold = 126
-                allAverageThreshold = 180
-                # 1 2 3 4 5 6 7 8 9 filter ------------------- averageCalculationWithoutZeros function
-                # exp filter ------------------- averageCalculationWithNumpy function
-                #imgAverageThreshold = 126
-                #allAverageThreshold = 180
-                # exp filter ------------------- averageCalculationWithoutZeros function
 
             if (isNight == True):
                 if (imgAverage > allMax):
                     allMax = imgAverage
                     maxName = im_list[l]
-                if (imgAverage > imgAverageThreshold):
+                if (imgAverage > self.imgAverageThreshold):
                     nightErrorCount = nightErrorCount + 1
 
             else:
                 if (imgAverage < allMin):
                     allMin = imgAverage
                     minName = im_list[l]
-                if (imgAverage < imgAverageThreshold):
+                if (imgAverage < self.imgAverageThreshold):
                     dayErrorCount = dayErrorCount + 1
 
         average = allSum / len(im_list)
@@ -134,12 +144,12 @@ class DNClassifier:
         print("average: ", average)
 
         if not isNight:
-            print("DAY", average >= allAverageThreshold)
+            print("DAY", average >= self.allAverageThreshold)
             print(l, " , ", minName, " , ", allMin)
             print("dayErrorCount: ", dayErrorCount)
 
         else:
-            print("NIGHT", average < allAverageThreshold)
+            print("NIGHT", average < self.allAverageThreshold)
             print(l, " , ", maxName, " , ", allMax)
             print("nightErrorCount: ", nightErrorCount)
         toc = time.time()
@@ -151,8 +161,8 @@ class DNClassifier:
             plt.hist(nightAveragesArray, bins=255, range=[0, 255])
             plt.hist(dayAveragesArray, bins=255, range=[0, 255])
         else:
-            plt.hist(nightAveragesArray, bins=400, range=[0, 400])
-            plt.hist(dayAveragesArray, bins=400, range=[0, 400])
+            plt.hist(nightAveragesArray, bins=int(np.exp(16)), range=[0, np.exp(16)])
+            plt.hist(dayAveragesArray, bins=int(np.exp(16)), range=[0, np.exp(16)])
 
         plt.show()
 
@@ -199,9 +209,9 @@ if __name__ == "__main__":
     dn_classifier = DNClassifier()
     # For MacOs
     # im_list_array = ["../../../../Volumes/Bariscan/Dataset/Gece/1/stereo/centre", "../../../../Volumes/Bariscan/Dataset/sample/stereo/centre", "../../../../Volumes/Bariscan/Dataset/gunduz1/Centre"]
-    im_list_array = ["/media/bkurtkaya/Barışcan HDD/tubitak-2209/Dataset/Gece/1/stereo/centre", "/media/bkurtkaya/Barışcan HDD/tubitak-2209/Dataset/Gece3/1/stereo/centre",
-                     "/media/bkurtkaya/Barışcan HDD/tubitak-2209/Dataset/Gece4/1/stereo/centre", "/media/bkurtkaya/Barışcan HDD/tubitak-2209/Dataset/gunduz2/1/stereo/centre",
-                     "/media/bkurtkaya/Barışcan HDD/tubitak-2209/Dataset/gunduz3/1/stereo/centre", "/media/bkurtkaya/Barışcan HDD/tubitak-2209/Dataset/gunduz4/1/stereo/centre"]
+    im_list_array = ["../Dataset/Gece/1/stereo/centre", "../Dataset/Gece3/1/stereo/centre",
+                     "../Dataset/Gece4/1/stereo/centre", "../Dataset/gunduz2/1/stereo/centre",
+                     "../Dataset/gunduz3/1/stereo/centre", "../Dataset/gunduz4/1/stereo/centre"]
 
     nightAveragesArray = []
     dayAveragesArray = []
@@ -225,8 +235,7 @@ if __name__ == "__main__":
 
                 if not isDisplay:
                     nightImageCount += len(im_list)
-                    averagesArray = dn_classifier.thresholdTest(im_list, isNight, nightAveragesArray,
-                                                                dn_classifier.filterImg, isFilter)
+                    averagesArray = dn_classifier.thresholdTest(im_list, isNight, nightAveragesArray, isFilter)
                     nightAveragesArray += averagesArray
 
                 else:
@@ -238,8 +247,7 @@ if __name__ == "__main__":
 
                 if not isDisplay:
                     dayImageCount += len(im_list)
-                    averagesArray = dn_classifier.thresholdTest(im_list, isNight, dayAveragesArray,
-                                                                dn_classifier.filterImg, isFilter)
+                    averagesArray = dn_classifier.thresholdTest(im_list, isNight, dayAveragesArray, isFilter)
                     dayAveragesArray += averagesArray
 
                 else:
