@@ -20,8 +20,8 @@ def imageSubstraction(dayImg, nightImg):
         print("same2")
 
 
-    cv2.imwrite("../Test_results/dayDifferenceSubstractNight.png", daySubstractNightImg)
-    cv2.imwrite("../Test_results/nightDifferenceSubstractDay.png", nightSubstractDayImg)
+    cv2.imwrite("../../Test_results/dayDifferenceSubstractNight.png", daySubstractNightImg)
+    cv2.imwrite("../../Test_results/nightDifferenceSubstractDay.png", nightSubstractDayImg)
 
 
 def createFilter(dayImg, nightImg):
@@ -34,7 +34,7 @@ def createFilter(dayImg, nightImg):
     #filterImg = np.round(filterImg)
     #filterImg = filterImg.astype(np.uint8)
     #cv2.imwrite("../Test_results/differenceFilterImgGreaterExp.png", filterImg)
-    np.savetxt("../Test_results/differenceFilterImgGreaterExp.csv", filterImg, delimiter=',')
+    np.savetxt("../../Test_results/differenceFilterImgGreaterExp.csv", filterImg, delimiter=',')
     return filterImg
     
     
@@ -43,8 +43,8 @@ def createFilter(dayImg, nightImg):
     
 ################# ALGORITHM ################
 if __name__ == "__main__":
-    dayAveragePhoto = (glob.glob("../Test_results/differenceDayAverage.png")) 
-    nightAveragePhoto = (glob.glob("../Test_results/differenceNightAverage.png")) 
+    dayAveragePhoto = (glob.glob("../../Test_results/differenceDayAverage.png")) 
+    nightAveragePhoto = (glob.glob("../../Test_results/differenceNightAverage.png")) 
 
     dayImg = cv2.imread(dayAveragePhoto[0] , cv2.IMREAD_UNCHANGED)
     nightImg = cv2.imread(nightAveragePhoto[0] , cv2.IMREAD_UNCHANGED)
