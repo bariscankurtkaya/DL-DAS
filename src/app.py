@@ -12,13 +12,16 @@ class App:
     def __init__(self):
         self.is_ony_line_preview = True
         self.dn_classifier = DNClassifier()
+        self.dn_classifier.imageThresholdSelection()
         self.lane_detection = LaneDetection()
+
+        self.isFilter = True
 
         # cnn_predicted_coordinates = [[class, probability, x0, y0, width, height]]
         self.cnn_predicted_coordinates = []
 
-    def test_dn_lassifier(self, img):
-        return self.dn_classifier.thresholdTestForOneImage(img)
+    def test_dn_lassifier(self, img, isFilter):
+        return self.dn_classifier.thresholdTestForOneImage(img, isFilter)
 
     def cnn_predicted_coordinates(self, is_night):
         if is_night:
