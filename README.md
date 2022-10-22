@@ -29,5 +29,5 @@ Nowadays, cars are an indispensable part of our lives in transportation and peop
 |Before filter|After filter|
 |---------|---------------|
 
-|<img width="425" height="300" alt="beforeFilter" src="https://user-images.githubusercontent.com/33360380/197346797-6d2a9d74-6754-426b-9bcf-afcec6933243.png"><img width="425" height="300" alt="afterFilter" src="https://user-images.githubusercontent.com/33360380/197346805-dc0b8409-6808-41d8-99e1-157f22ed7118.png">|
+|<img width="350" height="300" alt="beforeFilter" src="https://user-images.githubusercontent.com/33360380/197346797-6d2a9d74-6754-426b-9bcf-afcec6933243.png"><img width="350" height="300" alt="afterFilter" src="https://user-images.githubusercontent.com/33360380/197346805-dc0b8409-6808-41d8-99e1-157f22ed7118.png">|
 </div>
