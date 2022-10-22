@@ -7,16 +7,23 @@
 
 ## Algorithm Procedure:
 
-###### Filter creation algorithm
-<img width="400" height="300" alt="filterCreationAlgorithm" src="https://user-images.githubusercontent.com/33360380/197346926-fb2197c8-2cf6-4475-9f18-e45e0b6c3e6c.png">
+<div align="center">
 
-###### Filter algorithm
-<img width="400" height="300" alt="filterAlgorithm" src="https://user-images.githubusercontent.com/33360380/197346934-ccd14de0-3c24-45bc-bb18-821b24336f44.png">
+|Filter creation algorithm|Filter algorithm|
+|------|-------|
+
+<img width="425" height="300" alt="filterCreationAlgorithm" src="https://user-images.githubusercontent.com/33360380/197346926-fb2197c8-2cf6-4475-9f18-e45e0b6c3e6c.png"> <img width="425" height="300" alt="filterAlgorithm" src="https://user-images.githubusercontent.com/33360380/197347263-a598d1ae-bbfb-4a82-aaf8-fc3f64510761.png">
+
+</div>
+
 
 ## Results:
+###### Day and night image matrice values:
 
-###### Day and night image matrice values before filter
-<img width="400" height="300" alt="beforeFilter" src="https://user-images.githubusercontent.com/33360380/197346797-6d2a9d74-6754-426b-9bcf-afcec6933243.png">
+<div align="center">
 
-###### Day and night image matrice values after our filter
-<img width="400" height="300" alt="afterFilter" src="https://user-images.githubusercontent.com/33360380/197346805-dc0b8409-6808-41d8-99e1-157f22ed7118.png">
+|Before filter|After filter|
+|---------|---------------|
+
+<img width="425" height="300" alt="beforeFilter" src="https://user-images.githubusercontent.com/33360380/197346797-6d2a9d74-6754-426b-9bcf-afcec6933243.png"><img width="425" height="300" alt="afterFilter" src="https://user-images.githubusercontent.com/33360380/197346805-dc0b8409-6808-41d8-99e1-157f22ed7118.png">
+</div>
