@@ -1,4 +1,4 @@
-# Driver Assistance System with Computer Vision (DAS-CV)
+# Deep Learning based Driver Assistance System (DL-DAS)
 
 
 ## Project Abstract:
