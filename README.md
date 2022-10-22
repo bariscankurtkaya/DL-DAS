@@ -18,7 +18,30 @@ Nowadays, cars are an indispensable part of our lives in transportation and peop
 |-------|
 <img width="425" height="300" alt="filterAlgorithm" src="https://user-images.githubusercontent.com/33360380/197347263-a598d1ae-bbfb-4a82-aaf8-fc3f64510761.png">
 
+|Flowchart|
+|----|
+
+```mermaid
+flowchart TD
+    A[Start] --> B[Taking Image]
+    B --> C[Filter Algorithm]
+    C --> D{Is image from night?}
+    D --> |YES| E[Use Model Tuned with Oxford Robotcar Dataset]
+    D --> |NO| F[Use Pretrained Yolo Model with COCO]
+    E --> G[Object and Lane Detection]
+    F --> G
+    G --> H{Are there any object between lanes?}
+    H --> |YES| I[Distance Calculation]
+    H --> |NO|
+    
+    
+    B -->|Yes| C[OK]
+    C --> D[Rethink]
+    D --> B
+    B ---->|No| E[End]
+```
 </div>
+
 
 
 ## Results:
