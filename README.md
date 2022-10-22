@@ -31,14 +31,12 @@ flowchart TD
     E --> G[Object and Lane Detection]
     F --> G
     G --> H{Are there any object between lanes?}
-    H --> |YES| I[Distance Calculation]
-    H --> |NO|
-    
-    
-    B -->|Yes| C[OK]
-    C --> D[Rethink]
-    D --> B
-    B ---->|No| E[End]
+    H --> |YES| I[Distance Calculation]
+    H --> |NO| B
+    I --> J{Are there enough distance?}
+    J --> |Yes| B
+    J --> |NO| K[Warn the driver!]
+    K --> B
 ```
 </div>
 
