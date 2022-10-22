@@ -32,10 +32,12 @@ flowchart TD
     F --> G
     G --> H{Are there any object between lanes?}
     H --> |YES| I[Distance Calculation]
-    H --> |NO| B
+    H --> |NO| L{Is our car inside between lanes?}
     I --> J{Are there enough distance?}
-    J --> |Yes| B
+    J --> |Yes| L
     J --> |NO| K[Warn the driver!]
+    L --> |YES| B
+    L --> |NO| K
     K --> B
 ```
 </div>
