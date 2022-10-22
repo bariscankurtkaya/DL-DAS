@@ -40,8 +40,6 @@ flowchart TD
 ```
 </div>
 
-
-
 ## Results:
 ###### Day and night image matrice values:
 
