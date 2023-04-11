@@ -5,8 +5,8 @@ import os
 import glob
 
 lut={}
-lut["person"] = 0
-lut["carBumper"] = 2
+lut["pedestrian"] = 0
+lut["carBumper"] = 1
 
 
 
