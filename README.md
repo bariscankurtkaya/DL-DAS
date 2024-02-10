@@ -1,5 +1,6 @@
 # Deep Learning based Driver Assistance System (DL-DAS)
 
+Paper PDF: https://electricajournal.org/en/deep-learning-based-driver-assistance-system-161988
 
 ## Paper Abstract:
 
